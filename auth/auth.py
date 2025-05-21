@@ -26,8 +26,8 @@ PASSWORD = "password"
 def login():
     if request.method == "POST":
     #get form data
-        username = request.form.get(username)
-        password = request.form.get(password)
+        username = request.form.get("username")
+        password = request.form.get("password")
 
         #check credentials
         if username == USERNAME and password == PASSWORD:
@@ -45,14 +45,15 @@ def welcome():
 def register():
     if request.method == "POST":
         #get data from form
-        username = request.form.get(username)
-        password = request.form.get(password)
+        username = request.form.get("username")
+        password = request.form.get("password")
         #Check if username exsits
-        if User.query.filter_by(username = username):
+        if User.query.filter_by(username = username).first():
+            #if username exists, return error
             return render_template('register.html', error ="username already exists")
         #Else Add the new user to the user Database
         newUser = User(username = username, password= password)
-        db.sessionadd(newUser)
+        db.session.add(newUser)
         db.session.commit()
         return redirect(url_for("login")) #redirect to login Url
     return render_template("register.html") #redirects to another template of URL
