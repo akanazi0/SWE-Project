@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Admin - All Events</title>
+</head>
+<body>
+    <h2>All Events (Admin View)</h2>
+    <ul>
+    {% for event in events %}
+        <li>
+            <strong>{{ event.name }}</strong> ({{ event.date }})<br>
+            {{ event.description }}
+        </li>
+    {% else %}
+        <li>No events available.</li>
+    {% endfor %}
+    </ul>
+    <a href="{{ url_for('admin_dashboard') }}">Back to Admin Dashboard</a>
+</body>
+</html>

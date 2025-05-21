@@ -1,10 +1,10 @@
-from flask import Flask, redirect, render_template, render_template_string, url_for, session, request
-from flask_sqlalchemy import SQLAlchemy 
+from flask import Flask, redirect, render_template, url_for, request, session, flash
+from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
 app.secret_key = 'your_secret_key'  # Needed for session
 
-# Create the SQLite database
+# Database config
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
@@ -15,36 +15,47 @@ class User(db.Model):
     username = db.Column(db.String(80), unique=True, nullable=False)
     password = db.Column(db.String(120), nullable=False)
 
+# Event model
+class Event(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(120), nullable=False)
+    date = db.Column(db.String(20), nullable=False)
+    description = db.Column(db.Text, nullable=False)
+
+# Booking model
+class Booking(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    event_id = db.Column(db.Integer, db.ForeignKey('event.id'), nullable=False)
+
 # Create database tables
 with app.app_context():
     db.create_all()
 
-# admin credentials
-
+# Admin credentials
 USERNAME = "admin"
 PASSWORD = "ntsa3d"
 
+# User login
 @app.route('/', methods=["GET", "POST"])
 def login():
     if request.method == "POST":
         username = request.form.get("username")
         password = request.form.get("password")
-
         # Check admin credentials
         if username == USERNAME and password == PASSWORD:
+            session['username'] = username
             return redirect(url_for("admin_dashboard"))
         # Check database credentials
         user = User.query.filter_by(username=username, password=password).first()
         if user:
+            session['username'] = username
             return redirect(url_for("welcome"))
         else:
             return render_template("login.html", error="invalid username or password")
     return render_template("login.html")
 
-@app.route("/welcome")
-def welcome():
-    return render_template("welcome.html")
-
+# User registration
 @app.route('/register', methods=["GET", "POST"])
 def register():
     if request.method == "POST":
@@ -58,71 +69,81 @@ def register():
         return redirect(url_for("login"))
     return render_template("register.html")
 
+# User homepage: shows all events and allows booking
+@app.route('/welcome')
+def welcome():
+    events = Event.query.order_by(Event.date).all()
+    return render_template('welcome.html', events=events)
+
+# Show only the logged-in user's booked events
+@app.route('/events')
+def show_events():
+    username = session.get('username')
+    if not username:
+        flash("Please log in to view your events.")
+        return redirect(url_for('login'))
+    user = User.query.filter_by(username=username).first()
+    if not user:
+        flash("User not found.")
+        return redirect(url_for('login'))
+    bookings = Booking.query.filter_by(user_id=user.id).all()
+    event_ids = [b.event_id for b in bookings]
+    events = Event.query.filter(Event.id.in_(event_ids)).order_by(Event.date).all()
+    return render_template('events.html', events=events)
+
+# Book an event
+@app.route('/book/<int:event_id>', methods=['POST'])
+def book_event(event_id):
+    username = session.get('username')
+    if not username:
+        flash("Please log in to book events.")
+        return redirect(url_for('login'))
+    user = User.query.filter_by(username=username).first()
+    if not user:
+        flash("User not found.")
+        return redirect(url_for('login'))
+    # Prevent duplicate bookings
+    if Booking.query.filter_by(user_id=user.id, event_id=event_id).first():
+        flash("Already booked this event.")
+        return redirect(url_for('welcome'))
+    booking = Booking(user_id=user.id, event_id=event_id)
+    db.session.add(booking)
+    db.session.commit()
+    flash("Event booked!")
+    return redirect(url_for('show_events'))
+
+# Admin dashboard
 @app.route('/admin-dashboard')
 def admin_dashboard():
     return render_template("admin_dashboard.html")
 
-
-events = []
-
-@app.route('/admin/events')
-def event_index():
-    return render_template_string("""
-        <h1>Event List</h1>
-        <ul>
-        {% for event in events %}
-            <li>
-                {{ event['name'] }} - {{ event['date'] }}
-                [<a href="{{ url_for('edit_event', event_id=loop.index0) }}">Edit</a>]
-                [<a href="{{ url_for('delete_event', event_id=loop.index0) }}" onclick="return confirm('Are you sure?');">Delete</a>]
-            </li>
-        {% endfor %}
-        </ul>
-        <a href="{{ url_for('create_event') }}">Create New Event</a>
-        <br><a href="{{ url_for('admin_dashboard') }}">Back to Dashboard</a>
-    """, events=events)
-
-@app.route('/admin/events/create', methods=['GET', 'POST'])
-def create_event():
+# Organizer portal (event management)
+@app.route('/admin/organizer-portal', methods=['GET', 'POST'])
+def event_portal():
     if request.method == 'POST':
         name = request.form['name']
         date = request.form['date']
-        events.append({'name': name, 'date': date})
-        return redirect(url_for('event_index'))
-    return render_template_string("""
-        <h1>Create Event</h1>
-        <form method="post">
-            Name: <input name="name"><br>
-            Date: <input name="date" type="date"><br>
-            <input type="submit" value="Create">
-        </form>
-        <a href="{{ url_for('event_index') }}">Back</a>
-    """)
+        description = request.form['description']
+        new_event = Event(name=name, date=date, description=description)
+        db.session.add(new_event)
+        db.session.commit()
+        return redirect(url_for('event_portal'))
+    events = Event.query.order_by(Event.date).all()
+    return render_template('organizer_portal.html', events=events)
 
-@app.route('/admin/events/edit/<int:event_id>', methods=['GET', 'POST'])
-def edit_event(event_id):
-    if event_id < 0 or event_id >= len(events):
-        return "Event not found", 404
-    if request.method == 'POST':
-        events[event_id]['name'] = request.form['name']
-        events[event_id]['date'] = request.form['date']
-        return redirect(url_for('event_index'))
-    event = events[event_id]
-    return render_template_string("""
-        <h1>Edit Event</h1>
-        <form method="post">
-            Name: <input name="name" value="{{ event['name'] }}"><br>
-            Date: <input name="date" type="date" value="{{ event['date'] }}"><br>
-            <input type="submit" value="Save">
-        </form>
-        <a href="{{ url_for('event_index') }}">Back</a>
-    """, event=event)
+# Admin: Show all events
+@app.route('/admin/show-events')
+def admin_show_events():
+    events = Event.query.order_by(Event.date).all()
+    return render_template('admin_show_events.html', events=events)
 
-@app.route('/admin/events/delete/<int:event_id>')
+# Delete event (from organizer portal)
+@app.route('/admin/events/delete/<int:event_id>', methods=['POST'])
 def delete_event(event_id):
-    if event_id < 0 or event_id >= len(events):
-        return "Event not found", 404
-    events.pop(event_id)
-    return redirect(url_for('event_index'))
+    event = Event.query.get_or_404(event_id)
+    db.session.delete(event)
+    db.session.commit()
+    return redirect(url_for('event_portal'))
+
 if __name__ == '__main__':
     app.run(debug=True)
