@@ -69,6 +69,15 @@ def register():
         return redirect(url_for("login"))
     return render_template("register.html")
 
+@app.route('/admin/all-events')
+def admin_all_events():
+    # Optional: check if the user is admin
+    if session.get('username') != USERNAME:
+        flash("Admin access only.")
+        return redirect(url_for('login'))
+    events = Event.query.order_by(Event.date).all()
+    return render_template('events.html', events=events)
+
 # User homepage: shows all events and allows booking
 @app.route('/welcome')
 def welcome():

@@ -414,9 +414,9 @@
             <nav>
                 <ul>
                     <li><a href="#" id="home-nav">Home</a></li>
-                    <li><a href="#" id="login-nav">Log in</a></li>
-                    <li><a href="#" id="register-nav">Register</a></li>
-                    <li><a href="#">Events</a></li>
+                    <li><a href="{{ url_for('login') }}">Log in</a></li>
+                    <li><a href="{{ url_for('register') }}">Register</a></li>
+                    <li><a href="{{ url_for('show_events') }}">Events </a></li>
                     <li><a href="#">Contact</a></li>
                 </ul>
             </nav>
@@ -606,51 +606,6 @@
         </section>
     </section>
 
-    <!-- Login Section -->
-    <section id="login-section" class="auth-container">
-        <div class="auth-form">
-            <h1>Login</h1>
-            <div id="login-error" class="error-message"></div>
-            <form id="login-form">
-                <label for="login-username">Username:</label>
-                <input type="text" id="login-username" name="username" required>
-                
-                <label for="login-password">Password:</label>
-                <input type="password" id="login-password" name="password" required>
-                
-                <button type="submit" class="auth-btn login-btn">Login</button>
-            </form>
-            <div class="auth-link">
-                Don't have an account? <a href="#" id="show-register">Register here</a>
-            </div>
-        </div>
-    </section>
-
-    <!-- Register Section -->
-    <section id="register-section" class="auth-container">
-        <div class="auth-form">
-            <h1>Register</h1>
-            <div id="register-error" class="error-message"></div>
-            <form id="register-form">
-                <label for="register-email">Email:</label>
-                <input type="email" id="register-email" name="email" required>
-                
-                <label for="register-username">Username:</label>
-                <input type="text" id="register-username" name="username" required>
-                
-                <label for="register-password">Password:</label>
-                <input type="password" id="register-password" name="password" required>
-                
-                <label for="register-confirm-password">Confirm Password:</label>
-                <input type="password" id="register-confirm-password" name="confirm_password" required>
-                
-                <button type="submit" class="auth-btn register-btn">Register</button>
-            </form>
-            <div class="auth-link">
-                Already have an account? <a href="#" id="show-login">Login here</a>
-            </div>
-        </div>
-    </section>
 
     <footer>
         <p>&copy; 2025 Event & Tourism Planner. All rights reserved.</p>
