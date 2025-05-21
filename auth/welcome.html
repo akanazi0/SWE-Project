@@ -11,6 +11,103 @@
             box-sizing: border-box;
             font-family: 'Segoe UI', sans-serif;
         }
+         /* Previous styles remain the same */
+        
+        /* New Events List Styles */
+        .events-container {
+            background: #fff;
+            padding: 2rem;
+            margin: 2rem auto;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            max-width: 1100px;
+        }
+        
+        .events-title {
+            font-size: 1.8rem;
+            color: #6e0399;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+        
+        .events-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+        
+        .event-card {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            overflow: hidden;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .event-card:hover {
+        
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .event-image {
+            height: 200px;
+            background-size: cover;
+            background-position: center;
+        }
+        
+        .event-details {
+            padding: 1.5rem;
+        }
+        
+        .event-title {
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+            color: #333;
+        }
+        
+        .event-category {
+            display: inline-block;
+            background: #f0f0f0;
+            color: #6e0399;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            margin-bottom: 0.8rem;
+        }
+        
+        .event-description {
+            color: #666;
+            margin-bottom: 1rem;
+            line-height: 1.5;
+        }
+        
+        .event-meta {
+            display: flex;
+            justify-content: space-between;
+            color: #888;
+            font-size: 0.9rem;
+        }
+        
+        .event-price {
+            color: #ff6600;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+        
+        .event-book {
+            background: #6e0399;
+            color: white;
+            border: none;
+            padding: 0.6rem 1.2rem;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 1rem;
+            width: 100%;
+            transition: background 0.3s;
+        }
+        
+        .event-book:hover {
+            background: #5a027a;
+        }
 
         body {
             background-color: #f4f4f4;
@@ -316,6 +413,7 @@
             </div>
             <nav>
                 <ul>
+                    <li><a href="#" id="home-nav">Home</a></li>
                     <li><a href="#" id="login-nav">Log in</a></li>
                     <li><a href="#" id="register-nav">Register</a></li>
                     <li><a href="#">Events</a></li>
@@ -351,7 +449,7 @@
                         <option value="adventure">Adventure</option>
                         <option value="beach">Beach Getaways</option>
                         <option value="cultural">Cultural Experiences</option>
-                        <option value="food">Food & Wine</option>
+                        <option value="food">Food & gourmets</option>
                         <option value="luxury">Luxury Travel</option>
                         <option value="family">Family Friendly</option>
                     </select>
@@ -381,6 +479,122 @@
             
             <button class="filter-apply" id="apply-filters">Apply Filters</button>
         </section>
+        </head>
+<body>
+    <!-- Previous HTML remains the same until after the filter section -->
+    
+    <!-- Add this right after the filter section -->
+    <section class="events-container">
+        <h3 class="events-title">Featured Events & Experiences</h3>
+        <div class="events-grid">
+            <!-- Event 1 -->
+            <div class="event-card">
+                <div class="event-image" style="background-image: url('https://source.unsplash.com/600x400/?adventure')"></div>
+                <div class="event-details">
+                    <h4 class="event-title">Mountain Trekking Adventure</h4>
+                    <span class="event-category">Adventure</span>
+                    <p class="event-description">Experience breathtaking views on our guided mountain trek through the scenic Alps.</p>
+                    <div class="event-meta">
+                        <span>3 days</span>
+                        <span class="event-price">$450</span>
+                    </div>
+                    <button class="event-book">Book Now</button>
+                </div>
+            </div>
+            
+            <!-- Event 2 -->
+            <div class="event-card">
+                <div class="event-image" style="background-image: url('https://source.unsplash.com/600x400/?beach')"></div>
+                <div class="event-details">
+                    <h4 class="event-title">Tropical Island Getaway</h4>
+                    <span class="event-category">Beach</span>
+                    <p class="event-description">Relax on pristine beaches with crystal clear waters and luxury accommodations.</p>
+                    <div class="event-meta">
+                        <span>7 days</span>
+                        <span class="event-price">$1200</span>
+                    </div>
+                    <button class="event-book">Book Now</button>
+                </div>
+            </div>
+            
+            <!-- Event 3 -->
+            <div class="event-card">
+                <div class="event-image" style="background-image: url('https://source.unsplash.com/600x400/?food')"></div>
+                <div class="event-details">
+                    <h4 class="event-title">Gourmet Food Tour</h4>
+                    <span class="event-category">Food & Gourmet</span>
+                    <p class="event-description">Sample the finest local cuisine with our expert food guides through the city's hidden gems.</p>
+                    <div class="event-meta">
+                        <span>1 day</span>
+                        <span class="event-price">$150</span>
+                    </div>
+                    <button class="event-book">Book Now</button>
+                </div>
+            </div>
+            
+            <!-- Event 4 -->
+            <div class="event-card">
+                <div class="event-image" style="background-image: url('https://source.unsplash.com/600x400/?museum')"></div>
+                <div class="event-details">
+                    <h4 class="event-title">Cultural Heritage Walk</h4>
+                    <span class="event-category">Cultural</span>
+                    <p class="event-description">Discover ancient history and architecture with our knowledgeable local guides.</p>
+                    <div class="event-meta">
+                        <span>2 days</span>
+                        <span class="event-price">$280</span>
+                    </div>
+                    <button class="event-book">Book Now</button>
+                </div>
+            </div>
+            
+            <!-- Event 5 -->
+            <div class="event-card">
+                <div class="event-image" style="background-image: url('https://source.unsplash.com/600x400/?family')"></div>
+                <div class="event-details">
+                    <h4 class="event-title">Family Fun Package</h4>
+                    <span class="event-category">Family</span>
+                    <p class="event-description">Kid-friendly activities and accommodations for the perfect family vacation.</p>
+                    <div class="event-meta">
+                        <span>5 days</span>
+                        <span class="event-price">$950</span>
+                    </div>
+                    <button class="event-book">Book Now</button>
+                </div>
+            </div>
+            
+            <!-- Event 6 -->
+            <div class="event-card">
+                <div class="event-image" style="background-image: url('https://source.unsplash.com/600x400/?luxury')"></div>
+                <div class="event-details">
+                    <h4 class="event-title">Luxury Resort Experience</h4>
+                    <span class="event-category">Luxury</span>
+                    <p class="event-description">Indulge in our 5-star all-inclusive resort with private beaches and premium services.</p>
+                    <div class="event-meta">
+                        <span>4 days</span>
+                        <span class="event-price">$2000</span>
+                    </div>
+                    <button class="event-book">Book Now</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Rest of the HTML remains the same -->
+
+    <script>
+        // Previous JavaScript remains the same
+        
+        // Add event booking functionality
+        document.querySelectorAll('.event-book').forEach(button => {
+            button.addEventListener('click', function() {
+                const eventCard = this.closest('.event-card');
+                const eventTitle = eventCard.querySelector('.event-title').textContent;
+                alert(`You've selected: ${eventTitle}\nThis would proceed to booking in a real application.`);
+            });
+        });
+    </script>
+</body>
+</html>
 
         <section class="features">
             <div class="container">
@@ -444,6 +658,13 @@
 
     <script>
         // Navigation between sections
+        document.getElementById('home-nav').addEventListener('click', function(e) {
+            e.preventDefault();
+            document.getElementById('main-content').style.display = 'block';
+            document.getElementById('login-section').style.display = 'none';
+            document.getElementById('register-section').style.display = 'none';
+        });
+
         document.getElementById('login-nav').addEventListener('click', function(e) {
             e.preventDefault();
             document.getElementById('main-content').style.display = 'none';
