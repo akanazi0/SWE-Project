@@ -413,12 +413,12 @@
 
     <!-- Main Homepage Content -->
     <section id="main-content">
-        <section class="hero" style="background-image: url(imgProj/camelpro.jpg);
+        <section class="hero" style="background-image: url(https://pbs.twimg.com/media/GjLFnZqW0AAdLZY?format=jpg&name=large);
             background-repeat: no-repeat;
             background-size: cover;">
             <div class="hero-text">
-                <h2>The journey ahead... Be ready!</h2>
-                <p>Discover unforgettable destinations and plan perfect events in one place.</p>
+                <h2 style="color: #6e0399;">The journey ahead... Be ready!</h2>
+                <p style="color: #6e0399;">Discover unforgettable destinations and plan perfect events in one place.</p>
             </div>
         </section>
 
@@ -474,173 +474,23 @@
         <section class="events-container">
             <h3 class="events-title">Recommendations</h3>
             <div class="events-grid">
-                <!-- Event 1 -->
+                {% for event in events %}
                 <div class="event-card">
-                    <div class="event-image" style="background-image: url('https://source.unsplash.com/600x400/?adventure')"></div>
+                    <div class="event-image" style="background-image: url('https://source.unsplash.com/600x400/?event,{{ event.name|urlencode }}')"></div>
                     <div class="event-details">
-                        <h4 class="event-title">Mountain Trekking Adventure</h4>
-                        <span class="event-category">Adventure</span>
-                        <p class="event-description">Experience breathtaking views on our guided mountain trek through the scenic Alps.</p>
+                        <h4 class="event-title">{{ event.name }}</h4>
+                        <span class="event-category">Custom</span>
+                        <p class="event-description">{{ event.description }}</p>
                         <div class="event-meta">
-                            <span>3 days</span>
-                            <span class="event-price">$450</span>
+                            <span>{{ event.date }}</span>
+                            <span class="event-price">--</span>
                         </div>
-                        
-                        <!-- Rating and Comment Section -->
-                        <div class="event-rating">
-                            <div class="stars">
-                                ★★★★☆
-                                <span class="review-count">(24 reviews)</span>
-                            </div>
-                            <div class="recent-comment">
-                                <div class="comment-author">Sarah J.</div>
-                                "The views were absolutely stunning! Our guide was knowledgeable and made the hike enjoyable."
-                            </div>
-                        </div>
-                        
                         <button class="event-book">Book Now</button>
                     </div>
                 </div>
-                
-                <!-- Event 2 -->
-                <div class="event-card">
-                    <div class="event-image" style="background-image: url('https://source.unsplash.com/600x400/?beach')"></div>
-                    <div class="event-details">
-                        <h4 class="event-title">Tropical Island Getaway</h4>
-                        <span class="event-category">Beach</span>
-                        <p class="event-description">Relax on pristine beaches with crystal clear waters and luxury accommodations.</p>
-                        <div class="event-meta">
-                            <span>7 days</span>
-                            <span class="event-price">$1200</span>
-                        </div>
-                        
-                        <!-- Rating and Comment Section -->
-                        <div class="event-rating">
-                            <div class="stars">
-                                ★★★★★
-                                <span class="review-count">(42 reviews)</span>
-                            </div>
-                            <div class="recent-comment">
-                                <div class="comment-author">Michael T.</div>
-                                "Paradise found! The resort exceeded all our expectations. Will definitely return!"
-                            </div>
-                        </div>
-                        
-                        <button class="event-book">Book Now</button>
-                    </div>
-                </div>
-                
-                <!-- Event 3 -->
-                <div class="event-card">
-                    <div class="event-image" style="background-image: url('https://source.unsplash.com/600x400/?food')"></div>
-                    <div class="event-details">
-                        <h4 class="event-title">Gourmet Food Tour</h4>
-                        <span class="event-category">Food & Gourmet</span>
-                        <p class="event-description">Sample the finest local cuisine with our expert food guides through the city's hidden gems.</p>
-                        <div class="event-meta">
-                            <span>1 day</span>
-                            <span class="event-price">$150</span>
-                        </div>
-                        
-                        <!-- Rating and Comment Section -->
-                        <div class="event-rating">
-                            <div class="stars">
-                                ★★★★☆
-                                <span class="review-count">(18 reviews)</span>
-                            </div>
-                            <div class="recent-comment">
-                                <div class="comment-author">Emma L.</div>
-                                "Discovered restaurants we never would have found on our own. The guide was fantastic!"
-                            </div>
-                        </div>
-                        
-                        <button class="event-book">Book Now</button>
-                    </div>
-                </div>
-                
-                <!-- Event 4 -->
-                <div class="event-card">
-                    <div class="event-image" style="background-image: url('https://source.unsplash.com/600x400/?museum')"></div>
-                    <div class="event-details">
-                        <h4 class="event-title">Cultural Heritage Walk</h4>
-                        <span class="event-category">Cultural</span>
-                        <p class="event-description">Discover ancient history and architecture with our knowledgeable local guides.</p>
-                        <div class="event-meta">
-                            <span>2 days</span>
-                            <span class="event-price">$280</span>
-                        </div>
-                        
-                        <!-- Rating and Comment Section -->
-                        <div class="event-rating">
-                            <div class="stars">
-                                ★★★★☆
-                                <span class="review-count">(15 reviews)</span>
-                            </div>
-                            <div class="recent-comment">
-                                <div class="comment-author">David K.</div>
-                                "Fascinating insights into the city's history. Our guide brought the past to life!"
-                            </div>
-                        </div>
-                        
-                        <button class="event-book">Book Now</button>
-                    </div>
-                </div>
-                
-                <!-- Event 5 -->
-                <div class="event-card">
-                    <div class="event-image" style="background-image: url('https://source.unsplash.com/600x400/?family')"></div>
-                    <div class="event-details">
-                        <h4 class="event-title">Family Fun Package</h4>
-                        <span class="event-category">Family</span>
-                        <p class="event-description">Kid-friendly activities and accommodations for the perfect family vacation.</p>
-                        <div class="event-meta">
-                            <span>5 days</span>
-                            <span class="event-price">$950</span>
-                        </div>
-                        
-                        <!-- Rating and Comment Section -->
-                        <div class="event-rating">
-                            <div class="stars">
-                                ★★★★☆
-                                <span class="review-count">(29 reviews)</span>
-                            </div>
-                            <div class="recent-comment">
-                                <div class="comment-author">Jennifer R.</div>
-                                "Our kids had a blast! So many activities to keep them entertained while we could relax too."
-                            </div>
-                        </div>
-                        
-                        <button class="event-book">Book Now</button>
-                    </div>
-                </div>
-                
-                <!-- Event 6 -->
-                <div class="event-card">
-                    <div class="event-image" style="background-image: url('https://source.unsplash.com/600x400/?luxury')"></div>
-                    <div class="event-details">
-                        <h4 class="event-title">Luxury Resort Experience</h4>
-                        <span class="event-category">Luxury</span>
-                        <p class="event-description">Indulge in our 5-star all-inclusive resort with private beaches and premium services.</p>
-                        <div class="event-meta">
-                            <span>4 days</span>
-                            <span class="event-price">$2000</span>
-                        </div>
-                        
-                        <!-- Rating and Comment Section -->
-                        <div class="event-rating">
-                            <div class="stars">
-                                ★★★★★
-                                <span class="review-count">(37 reviews)</span>
-                            </div>
-                            <div class="recent-comment">
-                                <div class="comment-author">Robert W.</div>
-                                "Absolute perfection from start to finish. Worth every penny for the exceptional service."
-                            </div>
-                        </div>
-                        
-                        <button class="event-book">Book Now</button>
-                    </div>
-                </div>
+                {% else %}
+                <p>No events available.</p>
+                {% endfor %}
             </div>
         </section>
 
