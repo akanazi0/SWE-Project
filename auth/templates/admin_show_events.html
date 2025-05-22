@@ -79,6 +79,7 @@
         {% for event in events %}
             <li>
                 <strong>{{ event.name }}</strong> ({{ event.date }})<br>
+                Price: ${{ "%.2f"|format(event.price or 0) }}<br>
                 {{ event.description }}
             </li>
         {% else %}

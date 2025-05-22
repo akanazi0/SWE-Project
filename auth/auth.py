@@ -25,6 +25,8 @@ class Event(db.Model):
     name = db.Column(db.String(120), nullable=False)
     date = db.Column(db.String(20), nullable=False)
     description = db.Column(db.Text, nullable=False)
+    price = db.Column(db.Float, nullable=True)
+    image_url = db.Column(db.String(300), nullable=True)  # Add this line
 
 # Booking model
 class Booking(db.Model):
@@ -130,7 +132,9 @@ def event_portal():
         name = request.form['name']
         date = request.form['date']
         description = request.form['description']
-        new_event = Event(name=name, date=date, description=description)
+        price = request.form.get('price', 0)
+        image_url = request.form.get('image_url', '')  # Add this line
+        new_event = Event(name=name, date=date, description=description, price=price, image_url=image_url)  # Add image_url
         db.session.add(new_event)
         db.session.commit()
         return redirect(url_for('event_portal'))

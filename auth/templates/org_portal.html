@@ -30,6 +30,7 @@
     }
     input[type="text"],
     input[type="date"],
+    input[type="url"],
     textarea {
       padding: 10px;
       border: 1px solid #ccc;
@@ -94,6 +95,8 @@
       <input type="text" name="name" placeholder="Event Title" required />
       <input type="date" name="date" required />
       <textarea name="description" rows="3" placeholder="Event Description" required></textarea>
+      <input type="number" name="price" placeholder="Price (USD)" step="0.01" min="0" required />
+      <input type="url" name="image_url" placeholder="Image URL (optional)" />
       <button type="submit">Add Event</button>
     </form>
 
@@ -102,8 +105,12 @@
       {% for event in events %}
       <div class="event">
         <div class="event-details">
+          {% if event.image_url %}
+            <img src="{{ event.image_url }}" alt="Event Image" style="max-width:120px;max-height:80px;margin-bottom:8px;">
+          {% endif %}
           <strong>{{ event.name }}</strong><br>
-          <small>Date: {{ event.date }}</small>
+          <small>Date: {{ event.date }}</small><br>
+          <small>Price: ${{ "%.2f"|format(event.price or 0) }}</small>
           <p>{{ event.description }}</p>
         </div>
         <div class="event-actions">
