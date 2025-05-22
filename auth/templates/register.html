@@ -12,16 +12,16 @@
             height: 100vh;
             margin: 0;
             font-family: Arial, sans-serif;
-            background-color: #f5f5f5;
+            background-color: #ffffff;
         }
-        .register-container {
+        .login-container {
             text-align: center;
             padding: 30px;
             border: 1px solid #000000;
             border-radius: 8px;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
             width: 400px;
-            background-color: 240, 240, 240;
+            background-color: rgb(240, 240, 240);
         }
         h1 {
             color: #333;
@@ -49,7 +49,7 @@
         }
         input:focus {
             outline: none;
-            border-color: #007bff;
+            border-color: #ae00ff;
             box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
         }
         .error-message {
@@ -59,7 +59,7 @@
         }
         button {
             padding: 12px;
-            background-color: #4e00b3;
+            background-color: #ae00ff;
             color: white;
             border: none;
             border-radius: 4px;
@@ -70,17 +70,17 @@
             transition: background-color 0.3s;
         }
         button:hover {
-            background-color: #4e00b3;
+            background-color: #ae00ff;
         }
-        .login-link {
+        .register-link {
             margin-top: 20px;
             font-size: 14px;
         }
-        .login-link a {
-            color: #007bff;
+        .register-link a {
+            color: #001affbd;
             text-decoration: none;
         }
-        .login-link a:hover {
+        .register-link a:hover {
             text-decoration: underline;
         }
     </style>
@@ -88,24 +88,24 @@
 <body>
     <div class="register-container">
         <h1>Register</h1>
-
-        <form method="POST" action="/register">
+       
+        <form method="POST" action="{{ url_for('register') }}">
             <label for="Email">Email:</label>
             <input type="email" id="Email" name="Email" required>
-
+            
             <label for="username">Username:</label>
             <input type="text" id="username" name="username" required>
-
+            
             <label for="password">Password:</label>
             <input type="password" id="password" name="password" required>
-
+            
             <label for="confirm_password">Confirm Password:</label>
             <input type="password" id="confirm_password" name="confirm_password" required>
-
+            
             <button type="submit">Register</button>
         </form>
         <div class="login-link">
-            Already have an account? <a href="/login">Login here</a>
+            Already have an account? <a href="{{ url_for('login') }}">Login here</a>
         </div>
     </div>
 </body>

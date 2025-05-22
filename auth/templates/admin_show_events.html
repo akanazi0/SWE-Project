@@ -1,20 +1,91 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin - All Events</title>
+    <style>
+        body {
+            background-color: #f4f4f4;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        .events-container {
+            max-width: 600px;
+            margin: 60px auto;
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.10);
+            padding: 40px 30px 30px 30px;
+        }
+        h2 {
+            color: #6e0399;
+            margin-bottom: 30px;
+            text-align: center;
+            font-size: 2rem;
+        }
+        ul {
+            list-style: none;
+            padding: 0;
+        }
+        li {
+            background: #f7f3ff;
+            margin-bottom: 18px;
+            padding: 18px 16px;
+            border-radius: 8px;
+            box-shadow: 0 2px 6px rgba(110,3,153,0.04);
+        }
+        strong {
+            color: #6e0399;
+        }
+        a {
+            display: block;
+            margin: 30px auto 0 auto;
+            width: fit-content;
+            background: #6e0399;
+            color: #fff;
+            text-decoration: none;
+            padding: 12px 28px;
+            border-radius: 6px;
+            font-weight: bold;
+            transition: background 0.2s;
+        }
+        a:hover {
+            background: #ae00ff;
+        }
+        @media (max-width: 600px) {
+            .events-container {
+                padding: 18px 6px;
+            }
+            h2 {
+                font-size: 1.3rem;
+            }
+            li {
+                font-size: 0.98rem;
+                padding: 12px 8px;
+            }
+            a {
+                padding: 10px 16px;
+                font-size: 1rem;
+            }
+        }
+    </style>
 </head>
 <body>
-    <h2>All Events (Admin View)</h2>
-    <ul>
-    {% for event in events %}
-        <li>
-            <strong>{{ event.name }}</strong> ({{ event.date }})<br>
-            {{ event.description }}
-        </li>
-    {% else %}
-        <li>No events available.</li>
-    {% endfor %}
-    </ul>
-    <a href="{{ url_for('admin_dashboard') }}">Back to Admin Dashboard</a>
+    <div class="events-container">
+        <h2>All Events (Admin View)</h2>
+        <ul>
+        {% for event in events %}
+            <li>
+                <strong>{{ event.name }}</strong> ({{ event.date }})<br>
+                {{ event.description }}
+            </li>
+        {% else %}
+            <li>No events available.</li>
+        {% endfor %}
+        </ul>
+        <a href="{{ url_for('admin_dashboard') }}">Back to Admin Dashboard</a>
+    </div>
 </body>
 </html>

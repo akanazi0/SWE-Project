@@ -2,12 +2,16 @@ from flask import Flask, redirect, render_template, url_for, request, session, f
 from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
-app.secret_key = 'your_secret_key'  # Needed for session
+app.secret_key = 'your_secret_key'
 
 # Database config
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
+
+# Admin credentials
+USERNAME = "admin"
+PASSWORD = "ntsa3d"
 
 # User model
 class User(db.Model):
@@ -28,57 +32,45 @@ class Booking(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     event_id = db.Column(db.Integer, db.ForeignKey('event.id'), nullable=False)
 
-# Create database tables
 with app.app_context():
     db.create_all()
 
-# Admin credentials
-USERNAME = "admin"
-PASSWORD = "ntsa3d"
-
-# User login
+# Login route
 @app.route('/', methods=["GET", "POST"])
+@app.route('/login', methods=["GET", "POST"])
 def login():
+    error = None
     if request.method == "POST":
         username = request.form.get("username")
         password = request.form.get("password")
-        # Check admin credentials
-        if username == USERNAME and password == PASSWORD:
-            session['username'] = username
-            return redirect(url_for("admin_dashboard"))
-        # Check database credentials
         user = User.query.filter_by(username=username, password=password).first()
-        if user:
+        if user or (username == USERNAME and password == PASSWORD):
             session['username'] = username
+            print("Login successful, redirecting to welcome")  # Debug
             return redirect(url_for("welcome"))
         else:
-            return render_template("login.html", error="invalid username or password")
-    return render_template("login.html")
+            error = "Invalid username or password"
+    return render_template("login.html", error=error)
 
-# User registration
+# Register route
+# Register route
 @app.route('/register', methods=["GET", "POST"])
 def register():
+    error = None
     if request.method == "POST":
         username = request.form.get("username")
         password = request.form.get("password")
         if User.query.filter_by(username=username).first():
-            return render_template('register.html', error="username already exists")
-        newUser = User(username=username, password=password)
-        db.session.add(newUser)
-        db.session.commit()
-        return redirect(url_for("login"))
-    return render_template("register.html")
+            error = "Username already exists"
+        else:
+            newUser = User(username=username, password=password)
+            db.session.add(newUser)
+            db.session.commit()
+            session['username'] = username  # Log the user in
+            return redirect(url_for("welcome"))  # Redirect to welcome page
+    return render_template("register.html", error=error)
 
-@app.route('/admin/all-events')
-def admin_all_events():
-    # Optional: check if the user is admin
-    if session.get('username') != USERNAME:
-        flash("Admin access only.")
-        return redirect(url_for('login'))
-    events = Event.query.order_by(Event.date).all()
-    return render_template('events.html', events=events)
-
-# User homepage: shows all events and allows booking
+# Welcome page (user homepage)
 @app.route('/welcome')
 def welcome():
     events = Event.query.order_by(Event.date).all()
@@ -111,7 +103,6 @@ def book_event(event_id):
     if not user:
         flash("User not found.")
         return redirect(url_for('login'))
-    # Prevent duplicate bookings
     if Booking.query.filter_by(user_id=user.id, event_id=event_id).first():
         flash("Already booked this event.")
         return redirect(url_for('welcome'))
@@ -124,11 +115,17 @@ def book_event(event_id):
 # Admin dashboard
 @app.route('/admin-dashboard')
 def admin_dashboard():
+    if session.get('username') != USERNAME:
+        flash("Admin access only.")
+        return redirect(url_for('login'))
     return render_template("admin_dashboard.html")
 
 # Organizer portal (event management)
 @app.route('/admin/organizer-portal', methods=['GET', 'POST'])
 def event_portal():
+    if session.get('username') != USERNAME:
+        flash("Admin access only.")
+        return redirect(url_for('login'))
     if request.method == 'POST':
         name = request.form['name']
         date = request.form['date']
@@ -138,17 +135,32 @@ def event_portal():
         db.session.commit()
         return redirect(url_for('event_portal'))
     events = Event.query.order_by(Event.date).all()
-    return render_template('organizer_portal.html', events=events)
+    return render_template('org_portal.html', events=events)
 
-# Admin: Show all events
+# Admin: Show all events (admin view)
 @app.route('/admin/show-events')
 def admin_show_events():
+    if session.get('username') != USERNAME:
+        flash("Admin access only.")
+        return redirect(url_for('login'))
     events = Event.query.order_by(Event.date).all()
     return render_template('admin_show_events.html', events=events)
+
+# Admin: Show all events (user view)
+@app.route('/admin/all-events')
+def admin_all_events():
+    if session.get('username') != USERNAME:
+        flash("Admin access only.")
+        return redirect(url_for('login'))
+    events = Event.query.order_by(Event.date).all()
+    return render_template('events.html', events=events)
 
 # Delete event (from organizer portal)
 @app.route('/admin/events/delete/<int:event_id>', methods=['POST'])
 def delete_event(event_id):
+    if session.get('username') != USERNAME:
+        flash("Admin access only.")
+        return redirect(url_for('login'))
     event = Event.query.get_or_404(event_id)
     db.session.delete(event)
     db.session.commit()
