@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -12,7 +11,6 @@
             box-sizing: border-box;
             font-family: 'Segoe UI', sans-serif;
         }
-         /* Previous styles remain the same */
         
         /* New Events List Styles */
         .events-container {
@@ -45,7 +43,7 @@
         }
         
         .event-card:hover {
-        
+            transform: translateY(-5px);
             box-shadow: 0 5px 15px rgba(0,0,0,0.1);
         }
         
@@ -218,7 +216,7 @@
             padding: 1rem;
         }
 
-        /* Filter Section Styles */
+        /* Updated Filter Section Styles */
         .filter-container {
             background: #fff;
             padding: 2rem;
@@ -264,7 +262,7 @@
             color: #555;
         }
         
-        .filter-select, .filter-input {
+        .filter-select, .filter-input, .filter-search {
             width: 100%;
             padding: 0.8rem;
             border: 1px solid #ddd;
@@ -272,9 +270,16 @@
             font-size: 1rem;
         }
         
-        .filter-date-inputs {
-            display: flex;
-            gap: 1rem;
+        .filter-search-container {
+            width: 100%;
+            margin-bottom: 1.5rem;
+        }
+        
+        .filter-search {
+            padding-left: 2.5rem;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="%23666" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>');
+            background-repeat: no-repeat;
+            background-position: 0.8rem center;
         }
         
         .filter-apply {
@@ -400,8 +405,64 @@
         }
 
         /* Hide auth forms by default */
-        #login-section, #register-section {
+        #login-section, #register-section, #booked-events-section {
             display: none;
+        }
+
+        /* Booked Events Styles */
+        .booked-events-container {
+            max-width: 800px;
+            margin: 2rem auto;
+            background: #fff;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .booked-events-title {
+            text-align: center;
+            color: #6e0399;
+            margin-bottom: 1.5rem;
+        }
+
+        .event-list {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .booked-event {
+            border-bottom: 1px solid #e0e0e0;
+            padding: 15px 0;
+        }
+
+        .booked-event:last-child {
+            border-bottom: none;
+        }
+
+        .booked-event-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+
+        .booked-event-date {
+            color: #7f8c8d;
+            font-size: 14px;
+        }
+
+        .back-to-events {
+            display: block;
+            text-align: center;
+            margin-top: 20px;
+            color: #6e0399;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .back-to-events:hover {
+            text-decoration: underline;
         }
     </style>
 </head>
@@ -417,8 +478,9 @@
                     <li><a href="#" id="home-nav">Home</a></li>
                     <li><a href="#" id="login-nav">Log in</a></li>
                     <li><a href="#" id="register-nav">Register</a></li>
-                    <li><a href="#">Events</a></li>
-                    <li><a href="#">Contact</a></li>
+                    <li><a href="#" id="events-nav">Events</a></li>
+                    <li><a href="#" id="booked-events-nav">My Bookings</a></li>
+
                 </ul>
             </nav>
         </div>
@@ -434,11 +496,17 @@
             </div>
         </section>
 
-        <!-- Filter Section -->
+        <!-- Updated Filter Section with Search and Single Date -->
         <section class="filter-container">
             <div class="filter-header">
                 <h3 class="filter-title">Find Your Perfect Experience</h3>
                 <span class="filter-reset">Reset Filters</span>
+            </div>
+            
+            <!-- Search Input -->
+            <div class="filter-search-container">
+                <label class="filter-label" for="search-filter">Search Experiences</label>
+                <input type="text" class="filter-search" id="search-filter" placeholder="Search by name, location, or keywords">
             </div>
             
             <div class="filter-options">
@@ -464,138 +532,113 @@
                         <option value="budget">Budget ($100-$500)</option>
                         <option value="midrange">Mid-Range ($500-$1500)</option>
                         <option value="luxury">Luxury ($1500+)</option>
-                        <option value="custom">Custom Range</option>
                     </select>
                 </div>
                 
-                <!-- Date Filter -->
+                <!-- Single Date Filter -->
                 <div class="filter-group">
-                    <label class="filter-label">Travel Dates</label>
-                    <div class="filter-date-inputs">
-                        <input type="date" class="filter-input" id="start-date" placeholder="Start Date">
-                        <input type="date" class="filter-input" id="end-date" placeholder="End Date">
-                    </div>
+                    <label class="filter-label">Date</label>
+                    <input type="date" class="filter-input" id="event-date">
                 </div>
             </div>
             
             <button class="filter-apply" id="apply-filters">Apply Filters</button>
         </section>
-        </head>
-<body>
-    <!-- Previous HTML remains the same until after the filter section -->
-    
-    <!-- Add this right after the filter section -->
-    <section class="events-container">
-        <h3 class="events-title">Featured Events & Experiences</h3>
-        <div class="events-grid">
-            <!-- Event 1 -->
-            <div class="event-card">
-                <div class="event-image" style="background-image: url('https://source.unsplash.com/600x400/?adventure')"></div>
-                <div class="event-details">
-                    <h4 class="event-title">Mountain Trekking Adventure</h4>
-                    <span class="event-category">Adventure</span>
-                    <p class="event-description">Experience breathtaking views on our guided mountain trek through the scenic Alps.</p>
-                    <div class="event-meta">
-                        <span>3 days</span>
-                        <span class="event-price">$450</span>
-                    </div>
-                    <button class="event-book">Book Now</button>
-                </div>
-            </div>
-            
-            <!-- Event 2 -->
-            <div class="event-card">
-                <div class="event-image" style="background-image: url('https://source.unsplash.com/600x400/?beach')"></div>
-                <div class="event-details">
-                    <h4 class="event-title">Tropical Island Getaway</h4>
-                    <span class="event-category">Beach</span>
-                    <p class="event-description">Relax on pristine beaches with crystal clear waters and luxury accommodations.</p>
-                    <div class="event-meta">
-                        <span>7 days</span>
-                        <span class="event-price">$1200</span>
-                    </div>
-                    <button class="event-book">Book Now</button>
-                </div>
-            </div>
-            
-            <!-- Event 3 -->
-            <div class="event-card">
-                <div class="event-image" style="background-image: url('https://source.unsplash.com/600x400/?food')"></div>
-                <div class="event-details">
-                    <h4 class="event-title">Gourmet Food Tour</h4>
-                    <span class="event-category">Food & Gourmet</span>
-                    <p class="event-description">Sample the finest local cuisine with our expert food guides through the city's hidden gems.</p>
-                    <div class="event-meta">
-                        <span>1 day</span>
-                        <span class="event-price">$150</span>
-                    </div>
-                    <button class="event-book">Book Now</button>
-                </div>
-            </div>
-            
-            <!-- Event 4 -->
-            <div class="event-card">
-                <div class="event-image" style="background-image: url('https://source.unsplash.com/600x400/?museum')"></div>
-                <div class="event-details">
-                    <h4 class="event-title">Cultural Heritage Walk</h4>
-                    <span class="event-category">Cultural</span>
-                    <p class="event-description">Discover ancient history and architecture with our knowledgeable local guides.</p>
-                    <div class="event-meta">
-                        <span>2 days</span>
-                        <span class="event-price">$280</span>
-                    </div>
-                    <button class="event-book">Book Now</button>
-                </div>
-            </div>
-            
-            <!-- Event 5 -->
-            <div class="event-card">
-                <div class="event-image" style="background-image: url('https://source.unsplash.com/600x400/?family')"></div>
-                <div class="event-details">
-                    <h4 class="event-title">Family Fun Package</h4>
-                    <span class="event-category">Family</span>
-                    <p class="event-description">Kid-friendly activities and accommodations for the perfect family vacation.</p>
-                    <div class="event-meta">
-                        <span>5 days</span>
-                        <span class="event-price">$950</span>
-                    </div>
-                    <button class="event-book">Book Now</button>
-                </div>
-            </div>
-            
-            <!-- Event 6 -->
-            <div class="event-card">
-                <div class="event-image" style="background-image: url('https://source.unsplash.com/600x400/?luxury')"></div>
-                <div class="event-details">
-                    <h4 class="event-title">Luxury Resort Experience</h4>
-                    <span class="event-category">Luxury</span>
-                    <p class="event-description">Indulge in our 5-star all-inclusive resort with private beaches and premium services.</p>
-                    <div class="event-meta">
-                        <span>4 days</span>
-                        <span class="event-price">$2000</span>
-                    </div>
-                    <button class="event-book">Book Now</button>
-                </div>
-            </div>
-        </div>
-    </section>
 
-    <!-- Rest of the HTML remains the same -->
-
-    <script>
-        // Previous JavaScript remains the same
-        
-        // Add event booking functionality
-        document.querySelectorAll('.event-book').forEach(button => {
-            button.addEventListener('click', function() {
-                const eventCard = this.closest('.event-card');
-                const eventTitle = eventCard.querySelector('.event-title').textContent;
-                alert(`You've selected: ${eventTitle}\nThis would proceed to booking in a real application.`);
-            });
-        });
-    </script>
-</body>
-</html>
+        <section class="events-container">
+            <h3 class="events-title">Featured Events & Experiences</h3>
+            <div class="events-grid">
+                <!-- Event 1 -->
+                <div class="event-card">
+                    <div class="event-image" style="background-image: url('https://source.unsplash.com/600x400/?adventure')"></div>
+                    <div class="event-details">
+                        <h4 class="event-title">Mountain Trekking Adventure</h4>
+                        <span class="event-category">Adventure</span>
+                        <p class="event-description">Experience breathtaking views on our guided mountain trek through the scenic Alps.</p>
+                        <div class="event-meta">
+                            <span>3 days</span>
+                            <span class="event-price">$450</span>
+                        </div>
+                        <button class="event-book">Book Now</button>
+                    </div>
+                </div>
+                
+                <!-- Event 2 -->
+                <div class="event-card">
+                    <div class="event-image" style="background-image: url('https://source.unsplash.com/600x400/?beach')"></div>
+                    <div class="event-details">
+                        <h4 class="event-title">Tropical Island Getaway</h4>
+                        <span class="event-category">Beach</span>
+                        <p class="event-description">Relax on pristine beaches with crystal clear waters and luxury accommodations.</p>
+                        <div class="event-meta">
+                            <span>7 days</span>
+                            <span class="event-price">$1200</span>
+                        </div>
+                        <button class="event-book">Book Now</button>
+                    </div>
+                </div>
+                
+                <!-- Event 3 -->
+                <div class="event-card">
+                    <div class="event-image" style="background-image: url('https://source.unsplash.com/600x400/?food')"></div>
+                    <div class="event-details">
+                        <h4 class="event-title">Gourmet Food Tour</h4>
+                        <span class="event-category">Food & Gourmet</span>
+                        <p class="event-description">Sample the finest local cuisine with our expert food guides through the city's hidden gems.</p>
+                        <div class="event-meta">
+                            <span>1 day</span>
+                            <span class="event-price">$150</span>
+                        </div>
+                        <button class="event-book">Book Now</button>
+                    </div>
+                </div>
+                
+                <!-- Event 4 -->
+                <div class="event-card">
+                    <div class="event-image" style="background-image: url('https://source.unsplash.com/600x400/?museum')"></div>
+                    <div class="event-details">
+                        <h4 class="event-title">Cultural Heritage Walk</h4>
+                        <span class="event-category">Cultural</span>
+                        <p class="event-description">Discover ancient history and architecture with our knowledgeable local guides.</p>
+                        <div class="event-meta">
+                            <span>2 days</span>
+                            <span class="event-price">$280</span>
+                        </div>
+                        <button class="event-book">Book Now</button>
+                    </div>
+                </div>
+                
+                <!-- Event 5 -->
+                <div class="event-card">
+                    <div class="event-image" style="background-image: url('https://source.unsplash.com/600x400/?family')"></div>
+                    <div class="event-details">
+                        <h4 class="event-title">Family Fun Package</h4>
+                        <span class="event-category">Family</span>
+                        <p class="event-description">Kid-friendly activities and accommodations for the perfect family vacation.</p>
+                        <div class="event-meta">
+                            <span>5 days</span>
+                            <span class="event-price">$950</span>
+                        </div>
+                        <button class="event-book">Book Now</button>
+                    </div>
+                </div>
+                
+                <!-- Event 6 -->
+                <div class="event-card">
+                    <div class="event-image" style="background-image: url('https://source.unsplash.com/600x400/?luxury')"></div>
+                    <div class="event-details">
+                        <h4 class="event-title">Luxury Resort Experience</h4>
+                        <span class="event-category">Luxury</span>
+                        <p class="event-description">Indulge in our 5-star all-inclusive resort with private beaches and premium services.</p>
+                        <div class="event-meta">
+                            <span>4 days</span>
+                            <span class="event-price">$2000</span>
+                        </div>
+                        <button class="event-book">Book Now</button>
+                    </div>
+                </div>
+            </div>
+        </section>
 
         <section class="features">
             <div class="container">
@@ -653,50 +696,88 @@
         </div>
     </section>
 
+    <!-- Booked Events Section -->
+    <section id="booked-events-section" class="booked-events-container">
+        <h2 class="booked-events-title">My Booked Events</h2>
+        <div class="event-list">
+            <div class="booked-event">
+                <div class="booked-event-title">Wedding Ceremony</div>
+                <div class="booked-event-date">June 15, 2025</div>
+            </div>
+            <div class="booked-event">
+                <div class="booked-event-title">Corporate Gala</div>
+                <div class="booked-event-date">July 3, 2025</div>
+            </div>
+            <div class="booked-event">
+                <div class="booked-event-title">Birthday Party</div>
+                <div class="booked-event-date">August 21, 2025</div>
+            </div>
+        </div>
+        <a href="#" class="back-to-events" id="back-to-events">Back to Events</a>
+    </section>
+
     <footer>
         <p>&copy; 2025 Event & Tourism Planner. All rights reserved.</p>
     </footer>
 
     <script>
         // Navigation between sections
-        document.getElementById('home-nav').addEventListener('click', function(e) {
-            e.preventDefault();
-            document.getElementById('main-content').style.display = 'block';
+        function showSection(sectionId) {
+            document.getElementById('main-content').style.display = 'none';
             document.getElementById('login-section').style.display = 'none';
             document.getElementById('register-section').style.display = 'none';
+            document.getElementById('booked-events-section').style.display = 'none';
+            
+            if (sectionId) {
+                document.getElementById(sectionId).style.display = sectionId === 'main-content' ? 'block' : 'flex';
+            }
+        }
+
+        document.getElementById('home-nav').addEventListener('click', function(e) {
+            e.preventDefault();
+            showSection('main-content');
         });
 
         document.getElementById('login-nav').addEventListener('click', function(e) {
             e.preventDefault();
-            document.getElementById('main-content').style.display = 'none';
-            document.getElementById('register-section').style.display = 'none';
-            document.getElementById('login-section').style.display = 'flex';
+            showSection('login-section');
         });
 
         document.getElementById('register-nav').addEventListener('click', function(e) {
             e.preventDefault();
-            document.getElementById('main-content').style.display = 'none';
-            document.getElementById('login-section').style.display = 'none';
-            document.getElementById('register-section').style.display = 'flex';
+            showSection('register-section');
+        });
+
+        document.getElementById('events-nav').addEventListener('click', function(e) {
+            e.preventDefault();
+            showSection('main-content');
+            // Scroll to events section
+            document.querySelector('.events-container').scrollIntoView({ behavior: 'smooth' });
+        });
+
+        document.getElementById('booked-events-nav').addEventListener('click', function(e) {
+            e.preventDefault();
+            showSection('booked-events-section');
         });
 
         document.getElementById('get-started-btn').addEventListener('click', function(e) {
             e.preventDefault();
-            document.getElementById('main-content').style.display = 'none';
-            document.getElementById('login-section').style.display = 'none';
-            document.getElementById('register-section').style.display = 'flex';
+            showSection('register-section');
         });
 
         document.getElementById('show-register').addEventListener('click', function(e) {
             e.preventDefault();
-            document.getElementById('login-section').style.display = 'none';
-            document.getElementById('register-section').style.display = 'flex';
+            showSection('register-section');
         });
 
         document.getElementById('show-login').addEventListener('click', function(e) {
             e.preventDefault();
-            document.getElementById('register-section').style.display = 'none';
-            document.getElementById('login-section').style.display = 'flex';
+            showSection('login-section');
+        });
+
+        document.getElementById('back-to-events').addEventListener('click', function(e) {
+            e.preventDefault();
+            showSection('main-content');
         });
 
         // Form submissions (would be connected to your backend)
@@ -720,33 +801,95 @@
             alert('Registration functionality would be implemented here');
         });
 
-        // Filter functionality
+        // Event booking functionality
+        document.querySelectorAll('.event-book').forEach(button => {
+            button.addEventListener('click', function() {
+                const eventCard = this.closest('.event-card');
+                const eventTitle = eventCard.querySelector('.event-title').textContent;
+                
+                // In a real app, this would add the event to the user's bookings
+                alert(`You've booked: ${eventTitle}\nThis event has been added to your bookings.`);
+                
+                // Show the booked events section
+                showSection('booked-events-section');
+            });
+        });
+
+        // Updated filter functionality with search and single date
         document.getElementById('apply-filters').addEventListener('click', function() {
+            const searchQuery = document.getElementById('search-filter').value.toLowerCase();
             const category = document.getElementById('category-filter').value;
             const budget = document.getElementById('budget-filter').value;
-            const startDate = document.getElementById('start-date').value;
-            const endDate = document.getElementById('end-date').value;
+            const eventDate = document.getElementById('event-date').value;
             
-            // Here you would typically filter your content or make an API call
-            console.log('Applying filters:', {
-                category,
-                budget,
-                startDate,
-                endDate
-            });
-            
-            alert('Filters applied! In a real app, this would update the displayed content.');
+            // Filter the events based on these criteria
+            filterEvents(searchQuery, category, budget, eventDate);
         });
 
         document.querySelector('.filter-reset').addEventListener('click', function() {
+            document.getElementById('search-filter').value = '';
             document.getElementById('category-filter').value = '';
             document.getElementById('budget-filter').value = '';
-            document.getElementById('start-date').value = '';
-            document.getElementById('end-date').value = '';
+            document.getElementById('event-date').value = '';
             
-            // Here you would reset any filtered content
-            alert('Filters reset! In a real app, this would show all content again.');
+            // Reset any filtered content
+            resetFilters();
         });
+
+        function filterEvents(searchQuery, category, budget, date) {
+            const eventCards = document.querySelectorAll('.event-card');
+            let anyVisible = false;
+            
+            eventCards.forEach(card => {
+                const title = card.querySelector('.event-title').textContent.toLowerCase();
+                const desc = card.querySelector('.event-description').textContent.toLowerCase();
+                const cardCategory = card.querySelector('.event-category').textContent.toLowerCase();
+                const priceText = card.querySelector('.event-price').textContent;
+                const price = parseFloat(priceText.replace(/[^0-9.]/g, ''));
+                
+                // Determine budget range
+                let cardBudget = '';
+                if (price < 500) cardBudget = 'budget';
+                else if (price < 1500) cardBudget = 'midrange';
+                else cardBudget = 'luxury';
+                
+                // Check if card matches all filters
+                const matchesSearch = searchQuery === '' || 
+                    title.includes(searchQuery) || 
+                    desc.includes(searchQuery);
+                
+                const matchesCategory = category === '' || 
+                    cardCategory.includes(category.toLowerCase());
+                
+                const matchesBudget = budget === '' || 
+                    cardBudget === budget;
+                
+                // Date filtering would require actual event dates in your data
+                // For this example, we'll just show the card if no date is selected
+                const matchesDate = date === ''; 
+                
+                if (matchesSearch && matchesCategory && matchesBudget && matchesDate) {
+                    card.style.display = 'block';
+                    anyVisible = true;
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+            
+            if (!anyVisible) {
+                alert('No events match your filters. Try adjusting your criteria.');
+            }
+        }
+
+        function resetFilters() {
+            const eventCards = document.querySelectorAll('.event-card');
+            eventCards.forEach(card => {
+                card.style.display = 'block';
+            });
+        }
+
+        // Initialize by showing the main content
+        showSection('main-content');
     </script>
 </body>
 </html>
