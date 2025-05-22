@@ -1,0 +1,895 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Explore & Enjoy</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', sans-serif;
+        }
+        
+        /* New Events List Styles */
+        .events-container {
+            background: #fff;
+            padding: 2rem;
+            margin: 2rem auto;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            max-width: 1100px;
+        }
+        
+        .events-title {
+            font-size: 1.8rem;
+            color: #6e0399;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+        
+        .events-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+        
+        .event-card {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            overflow: hidden;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .event-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .event-image {
+            height: 200px;
+            background-size: cover;
+            background-position: center;
+        }
+        
+        .event-details {
+            padding: 1.5rem;
+        }
+        
+        .event-title {
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+            color: #333;
+        }
+        
+        .event-category {
+            display: inline-block;
+            background: #f0f0f0;
+            color: #6e0399;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            margin-bottom: 0.8rem;
+        }
+        
+        .event-description {
+            color: #666;
+            margin-bottom: 1rem;
+            line-height: 1.5;
+        }
+        
+        .event-meta {
+            display: flex;
+            justify-content: space-between;
+            color: #888;
+            font-size: 0.9rem;
+        }
+        
+        .event-price {
+            color: #ff6600;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+        
+        .event-book {
+            background: #6e0399;
+            color: white;
+            border: none;
+            padding: 0.6rem 1.2rem;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 1rem;
+            width: 100%;
+            transition: background 0.3s;
+        }
+        
+        .event-book:hover {
+            background: #5a027a;
+        }
+
+        body {
+            background-color: #f4f4f4;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        .about-section {
+            text-align: center;
+            width: 80%;
+            margin: 0 auto;
+            padding: 2rem 0;
+        }
+        
+        .about-section p {
+            max-width: 800px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1100px;
+            margin: auto;
+            overflow: hidden;
+        }
+
+        header {
+            background: #6e0399;
+            color: #f8f6f6;
+            padding: 1rem 0;
+        }
+
+        header h1 {
+            float: left;
+        }
+
+        nav {
+            float: right;
+        }
+
+        nav ul {
+            list-style: none;
+        }
+
+        nav ul li {
+            display: inline;
+            margin-left: 20px;
+        }
+
+        nav ul li a {
+            color: #fff;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        nav ul li a:hover {
+            color: #ff6600;
+        }
+
+        .hero {
+            background: url('https://source.unsplash.com/1600x600/?travel,event') no-repeat center center/cover;
+            height: 60vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            color: white;
+            padding: 0 2rem;
+            background-color: #c4b9b9;
+        }
+
+        .hero-text h2 {
+            font-size: 3rem;
+            margin-bottom: 10px;
+        }
+
+        .hero-text p {
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+        }
+
+        .btn {
+            background: #ff6600;
+            color: white;
+            padding: 0.7rem 1.5rem;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+            display: inline-block;
+        }
+
+        .btn:hover {
+            background: #e65c00;
+        }
+
+        .features {
+            background: #fff;
+            padding: 3rem 0;
+            display: flex;
+            justify-content: space-around;
+            text-align: center;
+        }
+
+        .feature {
+            width: 30%;
+            padding: 1rem;
+        }
+
+        /* Updated Filter Section Styles */
+        .filter-container {
+            background: #fff;
+            padding: 2rem;
+            margin: 2rem auto;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            max-width: 1100px;
+        }
+        
+        .filter-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+        
+        .filter-title {
+            font-size: 1.5rem;
+            color: #6e0399;
+        }
+        
+        .filter-reset {
+            color: #ff6600;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        
+        .filter-options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+        }
+        
+        .filter-group {
+            flex: 1;
+            min-width: 250px;
+        }
+        
+        .filter-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: bold;
+            color: #555;
+        }
+        
+        .filter-select, .filter-input, .filter-search {
+            width: 100%;
+            padding: 0.8rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+        
+        .filter-search-container {
+            width: 100%;
+            margin-bottom: 1.5rem;
+        }
+        
+        .filter-search {
+            padding-left: 2.5rem;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="%23666" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>');
+            background-repeat: no-repeat;
+            background-position: 0.8rem center;
+        }
+        
+        .filter-apply {
+            background: #6e0399;
+            color: white;
+            border: none;
+            padding: 0.8rem 2rem;
+            border-radius: 4px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 1.5rem;
+            transition: background 0.3s;
+        }
+        
+        .filter-apply:hover {
+            background: #5a027a;
+        }
+
+        /* Auth Pages Styling */
+        .auth-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: calc(100vh - 200px);
+            padding: 2rem 0;
+        }
+
+        .auth-form {
+            text-align: center;
+            padding: 30px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            width: 350px;
+            background-color: white;
+            margin: 2rem auto;
+        }
+
+        .auth-form h1 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .auth-form label {
+            display: block;
+            margin: 12px 0 6px;
+            text-align: left;
+            font-weight: bold;
+            color: #555;
+        }
+
+        .auth-form input {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 5px;
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .auth-form input:focus {
+            outline: none;
+            border-color: #007bff;
+            box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+        }
+
+        .error-message {
+            color: red;
+            margin: 10px 0;
+            font-size: 14px;
+        }
+
+        .auth-btn {
+            padding: 12px;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            margin-top: 20px;
+            transition: background-color 0.3s;
+            width: 100%;
+        }
+
+        .login-btn {
+            background-color: #007bff;
+        }
+
+        .login-btn:hover {
+            background-color: #0056b3;
+        }
+
+        .register-btn {
+            background-color: #28a745;
+        }
+
+        .register-btn:hover {
+            background-color: #218838;
+        }
+
+        .auth-link {
+            margin-top: 20px;
+            font-size: 14px;
+        }
+
+        .auth-link a {
+            color: #007bff;
+            text-decoration: none;
+        }
+
+        .auth-link a:hover {
+            text-decoration: underline;
+        }
+
+        footer {
+            background: #222;
+            color: #ccc;
+            text-align: center;
+            padding: 1rem 0;
+            margin-top: 2rem;
+        }
+
+        /* Hide auth forms by default */
+        #login-section, #register-section, #booked-events-section {
+            display: none;
+        }
+
+        /* Booked Events Styles */
+        .booked-events-container {
+            max-width: 800px;
+            margin: 2rem auto;
+            background: #fff;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .booked-events-title {
+            text-align: center;
+            color: #6e0399;
+            margin-bottom: 1.5rem;
+        }
+
+        .event-list {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .booked-event {
+            border-bottom: 1px solid #e0e0e0;
+            padding: 15px 0;
+        }
+
+        .booked-event:last-child {
+            border-bottom: none;
+        }
+
+        .booked-event-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+
+        .booked-event-date {
+            color: #7f8c8d;
+            font-size: 14px;
+        }
+
+        .back-to-events {
+            display: block;
+            text-align: center;
+            margin-top: 20px;
+            color: #6e0399;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .back-to-events:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>Explore & Enjoy</h1>
+            <div>
+                <img src="" >
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="#" id="home-nav">Home</a></li>
+                    <li><a href="#" id="login-nav">Log in</a></li>
+                    <li><a href="#" id="register-nav">Register</a></li>
+                    <li><a href="#" id="events-nav">Events</a></li>
+                    <li><a href="#" id="booked-events-nav">My Bookings</a></li>
+
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Homepage Content -->
+    <section id="main-content">
+        <section class="hero">
+            <div class="hero-text">
+                <h2>Your Journey Starts Here</h2>
+                <p>Discover unforgettable destinations and plan perfect events in one place.</p>
+                <a href="#" class="btn" id="get-started-btn">Get Started</a>
+            </div>
+        </section>
+
+        <!-- Updated Filter Section with Search and Single Date -->
+        <section class="filter-container">
+            <div class="filter-header">
+                <h3 class="filter-title">Find Your Perfect Experience</h3>
+                <span class="filter-reset">Reset Filters</span>
+            </div>
+            
+            <!-- Search Input -->
+            <div class="filter-search-container">
+                <label class="filter-label" for="search-filter">Search Experiences</label>
+                <input type="text" class="filter-search" id="search-filter" placeholder="Search by name, location, or keywords">
+            </div>
+            
+            <div class="filter-options">
+                <!-- Category Filter -->
+                <div class="filter-group">
+                    <label class="filter-label">Category</label>
+                    <select class="filter-select" id="category-filter">
+                        <option value="">All Categories</option>
+                        <option value="adventure">Adventure</option>
+                        <option value="beach">Beach Getaways</option>
+                        <option value="cultural">Cultural Experiences</option>
+                        <option value="food">Food & gourmets</option>
+                        <option value="luxury">Luxury Travel</option>
+                        <option value="family">Family Friendly</option>
+                    </select>
+                </div>
+                
+                <!-- Budget Filter -->
+                <div class="filter-group">
+                    <label class="filter-label">Budget Range</label>
+                    <select class="filter-select" id="budget-filter">
+                        <option value="">Any Budget</option>
+                        <option value="budget">Budget ($100-$500)</option>
+                        <option value="midrange">Mid-Range ($500-$1500)</option>
+                        <option value="luxury">Luxury ($1500+)</option>
+                    </select>
+                </div>
+                
+                <!-- Single Date Filter -->
+                <div class="filter-group">
+                    <label class="filter-label">Date</label>
+                    <input type="date" class="filter-input" id="event-date">
+                </div>
+            </div>
+            
+            <button class="filter-apply" id="apply-filters">Apply Filters</button>
+        </section>
+
+        <section class="events-container">
+            <h3 class="events-title">Featured Events & Experiences</h3>
+            <div class="events-grid">
+                <!-- Event 1 -->
+                <div class="event-card">
+                    <div class="event-image" style="background-image: url('https://source.unsplash.com/600x400/?adventure')"></div>
+                    <div class="event-details">
+                        <h4 class="event-title">Mountain Trekking Adventure</h4>
+                        <span class="event-category">Adventure</span>
+                        <p class="event-description">Experience breathtaking views on our guided mountain trek through the scenic Alps.</p>
+                        <div class="event-meta">
+                            <span>3 days</span>
+                            <span class="event-price">$450</span>
+                        </div>
+                        <button class="event-book">Book Now</button>
+                    </div>
+                </div>
+                
+                <!-- Event 2 -->
+                <div class="event-card">
+                    <div class="event-image" style="background-image: url('https://source.unsplash.com/600x400/?beach')"></div>
+                    <div class="event-details">
+                        <h4 class="event-title">Tropical Island Getaway</h4>
+                        <span class="event-category">Beach</span>
+                        <p class="event-description">Relax on pristine beaches with crystal clear waters and luxury accommodations.</p>
+                        <div class="event-meta">
+                            <span>7 days</span>
+                            <span class="event-price">$1200</span>
+                        </div>
+                        <button class="event-book">Book Now</button>
+                    </div>
+                </div>
+                
+                <!-- Event 3 -->
+                <div class="event-card">
+                    <div class="event-image" style="background-image: url('https://source.unsplash.com/600x400/?food')"></div>
+                    <div class="event-details">
+                        <h4 class="event-title">Gourmet Food Tour</h4>
+                        <span class="event-category">Food & Gourmet</span>
+                        <p class="event-description">Sample the finest local cuisine with our expert food guides through the city's hidden gems.</p>
+                        <div class="event-meta">
+                            <span>1 day</span>
+                            <span class="event-price">$150</span>
+                        </div>
+                        <button class="event-book">Book Now</button>
+                    </div>
+                </div>
+                
+                <!-- Event 4 -->
+                <div class="event-card">
+                    <div class="event-image" style="background-image: url('https://source.unsplash.com/600x400/?museum')"></div>
+                    <div class="event-details">
+                        <h4 class="event-title">Cultural Heritage Walk</h4>
+                        <span class="event-category">Cultural</span>
+                        <p class="event-description">Discover ancient history and architecture with our knowledgeable local guides.</p>
+                        <div class="event-meta">
+                            <span>2 days</span>
+                            <span class="event-price">$280</span>
+                        </div>
+                        <button class="event-book">Book Now</button>
+                    </div>
+                </div>
+                
+                <!-- Event 5 -->
+                <div class="event-card">
+                    <div class="event-image" style="background-image: url('https://source.unsplash.com/600x400/?family')"></div>
+                    <div class="event-details">
+                        <h4 class="event-title">Family Fun Package</h4>
+                        <span class="event-category">Family</span>
+                        <p class="event-description">Kid-friendly activities and accommodations for the perfect family vacation.</p>
+                        <div class="event-meta">
+                            <span>5 days</span>
+                            <span class="event-price">$950</span>
+                        </div>
+                        <button class="event-book">Book Now</button>
+                    </div>
+                </div>
+                
+                <!-- Event 6 -->
+                <div class="event-card">
+                    <div class="event-image" style="background-image: url('https://source.unsplash.com/600x400/?luxury')"></div>
+                    <div class="event-details">
+                        <h4 class="event-title">Luxury Resort Experience</h4>
+                        <span class="event-category">Luxury</span>
+                        <p class="event-description">Indulge in our 5-star all-inclusive resort with private beaches and premium services.</p>
+                        <div class="event-meta">
+                            <span>4 days</span>
+                            <span class="event-price">$2000</span>
+                        </div>
+                        <button class="event-book">Book Now</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="features">
+            <div class="container">
+               <div class="about-section">
+                    <h3>About Explore & Enjoy</h3>
+                    <p>At Explore & Enjoy, we believe that travel should be seamless, personalized, and unforgettable. Founded in 2025, our mission is to connect travelers with unique experiences, hidden gems, and expert-planned itineraries—all in one place. Whether you're a solo adventurer, a couple seeking romance, or a family planning the perfect getaway, we're here to turn your travel dreams into reality.</p>
+                </div>
+            </div>
+        </section>
+    </section>
+
+    <!-- Login Section -->
+    <section id="login-section" class="auth-container">
+        <div class="auth-form">
+            <h1>Login</h1>
+            <div id="login-error" class="error-message"></div>
+            <form id="login-form">
+                <label for="login-username">Username:</label>
+                <input type="text" id="login-username" name="username" required>
+                
+                <label for="login-password">Password:</label>
+                <input type="password" id="login-password" name="password" required>
+                
+                <button type="submit" class="auth-btn login-btn">Login</button>
+            </form>
+            <div class="auth-link">
+                Don't have an account? <a href="#" id="show-register">Register here</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Register Section -->
+    <section id="register-section" class="auth-container">
+        <div class="auth-form">
+            <h1>Register</h1>
+            <div id="register-error" class="error-message"></div>
+            <form id="register-form">
+                <label for="register-email">Email:</label>
+                <input type="email" id="register-email" name="email" required>
+                
+                <label for="register-username">Username:</label>
+                <input type="text" id="register-username" name="username" required>
+                
+                <label for="register-password">Password:</label>
+                <input type="password" id="register-password" name="password" required>
+                
+                <label for="register-confirm-password">Confirm Password:</label>
+                <input type="password" id="register-confirm-password" name="confirm_password" required>
+                
+                <button type="submit" class="auth-btn register-btn">Register</button>
+            </form>
+            <div class="auth-link">
+                Already have an account? <a href="#" id="show-login">Login here</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Booked Events Section -->
+    <section id="booked-events-section" class="booked-events-container">
+        <h2 class="booked-events-title">My Booked Events</h2>
+        <div class="event-list">
+            <div class="booked-event">
+                <div class="booked-event-title">Wedding Ceremony</div>
+                <div class="booked-event-date">June 15, 2025</div>
+            </div>
+            <div class="booked-event">
+                <div class="booked-event-title">Corporate Gala</div>
+                <div class="booked-event-date">July 3, 2025</div>
+            </div>
+            <div class="booked-event">
+                <div class="booked-event-title">Birthday Party</div>
+                <div class="booked-event-date">August 21, 2025</div>
+            </div>
+        </div>
+        <a href="#" class="back-to-events" id="back-to-events">Back to Events</a>
+    </section>
+
+    <footer>
+        <p>&copy; 2025 Event & Tourism Planner. All rights reserved.</p>
+    </footer>
+
+    <script>
+        // Navigation between sections
+        function showSection(sectionId) {
+            document.getElementById('main-content').style.display = 'none';
+            document.getElementById('login-section').style.display = 'none';
+            document.getElementById('register-section').style.display = 'none';
+            document.getElementById('booked-events-section').style.display = 'none';
+            
+            if (sectionId) {
+                document.getElementById(sectionId).style.display = sectionId === 'main-content' ? 'block' : 'flex';
+            }
+        }
+
+        document.getElementById('home-nav').addEventListener('click', function(e) {
+            e.preventDefault();
+            showSection('main-content');
+        });
+
+        document.getElementById('login-nav').addEventListener('click', function(e) {
+            e.preventDefault();
+            showSection('login-section');
+        });
+
+        document.getElementById('register-nav').addEventListener('click', function(e) {
+            e.preventDefault();
+            showSection('register-section');
+        });
+
+        document.getElementById('events-nav').addEventListener('click', function(e) {
+            e.preventDefault();
+            showSection('main-content');
+            // Scroll to events section
+            document.querySelector('.events-container').scrollIntoView({ behavior: 'smooth' });
+        });
+
+        document.getElementById('booked-events-nav').addEventListener('click', function(e) {
+            e.preventDefault();
+            showSection('booked-events-section');
+        });
+
+        document.getElementById('get-started-btn').addEventListener('click', function(e) {
+            e.preventDefault();
+            showSection('register-section');
+        });
+
+        document.getElementById('show-register').addEventListener('click', function(e) {
+            e.preventDefault();
+            showSection('register-section');
+        });
+
+        document.getElementById('show-login').addEventListener('click', function(e) {
+            e.preventDefault();
+            showSection('login-section');
+        });
+
+        document.getElementById('back-to-events').addEventListener('click', function(e) {
+            e.preventDefault();
+            showSection('main-content');
+        });
+
+        // Form submissions (would be connected to your backend)
+        document.getElementById('login-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            // Add your login logic here
+            alert('Login functionality would be implemented here');
+        });
+
+        document.getElementById('register-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            // Add your registration logic here
+            const password = document.getElementById('register-password').value;
+            const confirmPassword = document.getElementById('register-confirm-password').value;
+            
+            if (password !== confirmPassword) {
+                document.getElementById('register-error').textContent = 'Passwords do not match';
+                return;
+            }
+            
+            alert('Registration functionality would be implemented here');
+        });
+
+        // Event booking functionality
+        document.querySelectorAll('.event-book').forEach(button => {
+            button.addEventListener('click', function() {
+                const eventCard = this.closest('.event-card');
+                const eventTitle = eventCard.querySelector('.event-title').textContent;
+                
+                // In a real app, this would add the event to the user's bookings
+                alert(`You've booked: ${eventTitle}\nThis event has been added to your bookings.`);
+                
+                // Show the booked events section
+                showSection('booked-events-section');
+            });
+        });
+
+        // Updated filter functionality with search and single date
+        document.getElementById('apply-filters').addEventListener('click', function() {
+            const searchQuery = document.getElementById('search-filter').value.toLowerCase();
+            const category = document.getElementById('category-filter').value;
+            const budget = document.getElementById('budget-filter').value;
+            const eventDate = document.getElementById('event-date').value;
+            
+            // Filter the events based on these criteria
+            filterEvents(searchQuery, category, budget, eventDate);
+        });
+
+        document.querySelector('.filter-reset').addEventListener('click', function() {
+            document.getElementById('search-filter').value = '';
+            document.getElementById('category-filter').value = '';
+            document.getElementById('budget-filter').value = '';
+            document.getElementById('event-date').value = '';
+            
+            // Reset any filtered content
+            resetFilters();
+        });
+
+        function filterEvents(searchQuery, category, budget, date) {
+            const eventCards = document.querySelectorAll('.event-card');
+            let anyVisible = false;
+            
+            eventCards.forEach(card => {
+                const title = card.querySelector('.event-title').textContent.toLowerCase();
+                const desc = card.querySelector('.event-description').textContent.toLowerCase();
+                const cardCategory = card.querySelector('.event-category').textContent.toLowerCase();
+                const priceText = card.querySelector('.event-price').textContent;
+                const price = parseFloat(priceText.replace(/[^0-9.]/g, ''));
+                
+                // Determine budget range
+                let cardBudget = '';
+                if (price < 500) cardBudget = 'budget';
+                else if (price < 1500) cardBudget = 'midrange';
+                else cardBudget = 'luxury';
+                
+                // Check if card matches all filters
+                const matchesSearch = searchQuery === '' || 
+                    title.includes(searchQuery) || 
+                    desc.includes(searchQuery);
+                
+                const matchesCategory = category === '' || 
+                    cardCategory.includes(category.toLowerCase());
+                
+                const matchesBudget = budget === '' || 
+                    cardBudget === budget;
+                
+                // Date filtering would require actual event dates in your data
+                // For this example, we'll just show the card if no date is selected
+                const matchesDate = date === ''; 
+                
+                if (matchesSearch && matchesCategory && matchesBudget && matchesDate) {
+                    card.style.display = 'block';
+                    anyVisible = true;
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+            
+            if (!anyVisible) {
+                alert('No events match your filters. Try adjusting your criteria.');
+            }
+        }
+
+        function resetFilters() {
+            const eventCards = document.querySelectorAll('.event-card');
+            eventCards.forEach(card => {
+                card.style.display = 'block';
+            });
+        }
+
+        // Initialize by showing the main content
+        showSection('main-content');
+    </script>
+</body>
+</html>
