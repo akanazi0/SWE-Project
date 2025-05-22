@@ -1,5 +1,7 @@
-from flask import Flask, redirect, render_template, url_for, request, session, flash
+from flask import Flask, redirect, render_template, url_for, request, session, flash, send_from_directory
 from flask_sqlalchemy import SQLAlchemy
+import os
+from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
 app.secret_key = 'your_secret_key'
@@ -12,6 +14,15 @@ db = SQLAlchemy(app)
 # Admin credentials
 USERNAME = "admin"
 PASSWORD = "ntsa3d"
+
+# File upload config
+UPLOAD_FOLDER = os.path.join(os.path.dirname(__file__), 'uploads')
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
+# Ensure the uploads folder exists
+if not os.path.exists(UPLOAD_FOLDER):
+    os.makedirs(UPLOAD_FOLDER)
 
 # User model
 class User(db.Model):
@@ -26,7 +37,8 @@ class Event(db.Model):
     date = db.Column(db.String(20), nullable=False)
     description = db.Column(db.Text, nullable=False)
     price = db.Column(db.Float, nullable=True)
-    image_url = db.Column(db.String(300), nullable=True)  # Add this line
+    image_url = db.Column(db.String(300), nullable=True)
+    category = db.Column(db.String(50), nullable=True)  # <-- Add this line
 
 # Booking model
 class Booking(db.Model):
@@ -75,8 +87,48 @@ def register():
 # Welcome page (user homepage)
 @app.route('/welcome')
 def welcome():
-    events = Event.query.order_by(Event.date).all()
-    return render_template('welcome.html', events=events)
+    # Get filter parameters
+    search = request.args.get('search', '').strip()
+    category = request.args.get('category', '').strip()
+    budget = request.args.get('budget', '').strip()
+    date = request.args.get('date', '').strip()
+    reset = request.args.get('reset')
+
+    # Start with all events
+    query = Event.query
+
+    # Apply filters if not reset
+    if not reset:
+        if search:
+            query = query.filter(
+                (Event.name.ilike(f'%{search}%')) |
+                (Event.description.ilike(f'%{search}%'))
+            )
+        # Example: If you add a category field to Event, filter here
+        # if category:
+        #     query = query.filter(Event.category == category)
+        if budget:
+            if budget == 'budget':
+                query = query.filter(Event.price < 500)
+            elif budget == 'midrange':
+                query = query.filter(Event.price >= 500, Event.price < 1500)
+            elif budget == 'luxury':
+                query = query.filter(Event.price >= 1500)
+        if date:
+            query = query.filter(Event.date == date)
+
+    events = query.order_by(Event.date).all()
+
+    # Booked events logic (unchanged)
+    booked_events = []
+    username = session.get('username')
+    if username:
+        user = User.query.filter_by(username=username).first()
+        if user:
+            bookings = Booking.query.filter_by(user_id=user.id).all()
+            event_ids = [b.event_id for b in bookings]
+            booked_events = Event.query.filter(Event.id.in_(event_ids)).order_by(Event.date).all()
+    return render_template('welcome.html', events=events, booked_events=booked_events)
 
 # Show only the logged-in user's booked events
 @app.route('/events')
@@ -133,8 +185,22 @@ def event_portal():
         date = request.form['date']
         description = request.form['description']
         price = request.form.get('price', 0)
-        image_url = request.form.get('image_url', '')  # Add this line
-        new_event = Event(name=name, date=date, description=description, price=price, image_url=image_url)  # Add image_url
+        category = request.form.get('category', '')
+        image_url = ''
+        image_file = request.files.get('image_file')
+        if image_file and allowed_file(image_file.filename):
+            filename = secure_filename(image_file.filename)
+            filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+            image_file.save(filepath)
+            image_url = url_for('uploaded_file', filename=filename)
+        new_event = Event(
+            name=name,
+            date=date,
+            description=description,
+            price=price,
+            image_url=image_url,
+            category=category  # <-- Save category
+        )
         db.session.add(new_event)
         db.session.commit()
         return redirect(url_for('event_portal'))
@@ -170,5 +236,13 @@ def delete_event(event_id):
     db.session.commit()
     return redirect(url_for('event_portal'))
 
+@app.route('/uploads/<filename>')
+def uploaded_file(filename):
+    return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
+
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
 if __name__ == '__main__':
     app.run(debug=True)
+

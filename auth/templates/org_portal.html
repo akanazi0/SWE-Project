@@ -91,12 +91,21 @@
 <body>
   <div class="container">
     <h2>Organizer Portal</h2>
-    <form method="POST" action="{{ url_for('event_portal') }}">
+    <form method="POST" action="{{ url_for('event_portal') }}" enctype="multipart/form-data">
       <input type="text" name="name" placeholder="Event Title" required />
       <input type="date" name="date" required />
       <textarea name="description" rows="3" placeholder="Event Description" required></textarea>
       <input type="number" name="price" placeholder="Price (USD)" step="0.01" min="0" required />
-      <input type="url" name="image_url" placeholder="Image URL (optional)" />
+      <select name="category" required>
+        <option value="">Select Category</option>
+        <option value="adventure">Adventure</option>
+        <option value="beach">Beach Getaways</option>
+        <option value="cultural">Cultural Experiences</option>
+        <option value="food">Food & Gourmets</option>
+        <option value="luxury">Luxury Travel</option>
+        <option value="family">Family Friendly</option>
+      </select>
+      <input type="file" name="image_file" accept="image/*" />
       <button type="submit">Add Event</button>
     </form>
 
@@ -110,7 +119,8 @@
           {% endif %}
           <strong>{{ event.name }}</strong><br>
           <small>Date: {{ event.date }}</small><br>
-          <small>Price: ${{ "%.2f"|format(event.price or 0) }}</small>
+          <small>Price: ${{ "%.2f"|format(event.price or 0) }}</small><br>
+          <small>Category: {{ event.category }}</small><br>
           <p>{{ event.description }}</p>
         </div>
         <div class="event-actions">

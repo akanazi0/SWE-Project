@@ -402,7 +402,7 @@
                     <li><a href="#" id="home-nav">Home</a></li>
                     <li><a href="{{ url_for('login') }}">Log in</a></li>
                     <li><a href="{{ url_for('register') }}">Register</a></li>
-                    <li><a href="#" id="events-nav">Events</a></li>
+                    <li><a href="{{ url_for('show_events') }}" id="booked-events-nav">My Booked Events</a></li>
                     {% if session.get('username') == 'admin' %}
                     <li><a href="{{ url_for('admin_dashboard') }}">Admin Dashboard</a></li>
                     {% endif %}
@@ -423,69 +423,66 @@
         </section>
 
         <!-- Filter Section -->
-        <section class="filter-container">
+        <form class="filter-container" method="get" action="{{ url_for('welcome') }}">
             <div class="filter-header">
                 <h3 class="filter-title">Event filtering</h3>
-                <span class="filter-reset">Reset Filters</span>
+                <button type="submit" name="reset" value="1" class="filter-reset" style="background:none;border:none;cursor:pointer;">Reset Filters</button>
             </div>
-            
-            <!-- Search Input -->
             <div class="filter-search-container">
                 <label class="filter-label" for="search-filter">Search events</label>
-                <input type="text" class="filter-search" id="search-filter" placeholder="Search by name, location, or keywords">
+                <input type="text" class="filter-search" id="search-filter" name="search" placeholder="Search by name, location, or keywords" value="{{ request.args.get('search', '') }}">
             </div>
-            
             <div class="filter-options">
-                <!-- Category Filter -->
                 <div class="filter-group">
                     <label class="filter-label">Category</label>
-                    <select class="filter-select" id="category-filter">
+                    <select class="filter-select" id="category-filter" name="category">
                         <option value="">All Categories</option>
-                        <option value="adventure">Adventure</option>
-                        <option value="beach">Beach Getaways</option>
-                        <option value="cultural">Cultural Experiences</option>
-                        <option value="food">Food & gourmets</option>
-                        <option value="luxury">Luxury Travel</option>
-                        <option value="family">Family Friendly</option>
+                        <option value="adventure" {% if request.args.get('category') == 'adventure' %}selected{% endif %}>Adventure</option>
+                        <option value="beach" {% if request.args.get('category') == 'beach' %}selected{% endif %}>Beach Getaways</option>
+                        <option value="cultural" {% if request.args.get('category') == 'cultural' %}selected{% endif %}>Cultural Experiences</option>
+                        <option value="food" {% if request.args.get('category') == 'food' %}selected{% endif %}>Food & gourmets</option>
+                        <option value="luxury" {% if request.args.get('category') == 'luxury' %}selected{% endif %}>Luxury Travel</option>
+                        <option value="family" {% if request.args.get('category') == 'family' %}selected{% endif %}>Family Friendly</option>
                     </select>
                 </div>
-                
-                <!-- Budget Filter -->
                 <div class="filter-group">
                     <label class="filter-label">Budget Range</label>
-                    <select class="filter-select" id="budget-filter">
+                    <select class="filter-select" id="budget-filter" name="budget">
                         <option value="">Any Budget</option>
-                        <option value="budget">Budget ($100-$500)</option>
-                        <option value="midrange">Mid-Range ($500-$1500)</option>
-                        <option value="luxury">Luxury ($1500+)</option>
+                        <option value="budget" {% if request.args.get('budget') == 'budget' %}selected{% endif %}>Budget ($100-$500)</option>
+                        <option value="midrange" {% if request.args.get('budget') == 'midrange' %}selected{% endif %}>Mid-Range ($500-$1500)</option>
+                        <option value="luxury" {% if request.args.get('budget') == 'luxury' %}selected{% endif %}>Luxury ($1500+)</option>
                     </select>
                 </div>
-                
-                <!-- Single Date Filter -->
                 <div class="filter-group">
                     <label class="filter-label">Date</label>
-                    <input type="date" class="filter-input" id="event-date">
+                    <input type="date" class="filter-input" id="event-date" name="date" value="{{ request.args.get('date', '') }}">
                 </div>
             </div>
-            
-            <button class="filter-apply" id="apply-filters">Apply Filters</button>
-        </section>
+            <button class="filter-apply" type="submit" id="apply-filters">Apply Filters</button>
+        </form>
 
         <section class="events-container">
             <h3 class="events-title">Recommendations</h3>
             <div class="events-grid">
                 {% for event in events %}
                 <div class="event-card">
-                    <div class="event-image" style="background-image: url('https://source.unsplash.com/600x400/?event,{{ event.name|urlencode }}')"></div>
+                    {% if event.image_url %}
+  <div class="event-image" style="background-image: url('{{ event.image_url }}')"></div>
+{% else %}
+  <div class="event-image" style="background-image: url('https://source.unsplash.com/600x400/?event,{{ event.name|urlencode }}')"></div>
+{% endif %}
                     <div class="event-details">
                         <h4 class="event-title">{{ event.name }}</h4>
                         <span class="event-category">Custom</span>
                         <p class="event-description">{{ event.description }}</p>
                         <div class="event-meta">
                             <span>{{ event.date }}</span>
-                            <span class="event-price">--</span>
+                            <span class="event-price">${{ "%.2f"|format(event.price or 0) }}</span>
                         </div>
-                        <button class="event-book">Book Now</button>
+                        <form method="POST" action="{{ url_for('book_event', event_id=event.id) }}">
+                            <button type="submit" class="event-book">Book Now</button>
+                        </form>
                     </div>
                 </div>
                 {% else %}
@@ -508,18 +505,16 @@
     <section id="booked-events-section" class="booked-events-container">
         <h2 class="booked-events-title">My Booked Events</h2>
         <div class="event-list">
-            <div class="booked-event">
-                <div class="booked-event-title">Wedding Ceremony</div>
-                <div class="booked-event-date">June 15, 2025</div>
-            </div>
-            <div class="booked-event">
-                <div class="booked-event-title">Corporate Gala</div>
-                <div class="booked-event-date">July 3, 2025</div>
-            </div>
-            <div class="booked-event">
-                <div class="booked-event-title">Birthday Party</div>
-                <div class="booked-event-date">August 21, 2025</div>
-            </div>
+            {% if booked_events %}
+                {% for event in booked_events %}
+                <div class="booked-event">
+                    <div class="booked-event-title">{{ event.name }}</div>
+                    <div class="booked-event-date">{{ event.date }}</div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <p>You have not booked any events yet.</p>
+            {% endif %}
         </div>
         <a href="#" class="back-to-events" id="back-to-events">Back to Events</a>
     </section>
