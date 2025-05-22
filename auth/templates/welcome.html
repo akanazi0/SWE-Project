@@ -474,7 +474,11 @@
 {% endif %}
                     <div class="event-details">
                         <h4 class="event-title">{{ event.name }}</h4>
-                        <span class="event-category">Custom</span>
+                        {% if event.category %}
+                        <span class="event-category">{{ event.category|title }}</span>
+                        {% else %}
+                        <span class="event-category">Uncategorized</span>
+                        {% endif %}
                         <p class="event-description">{{ event.description }}</p>
                         <div class="event-meta">
                             <span>{{ event.date }}</span>
@@ -591,15 +595,15 @@
             filterEvents(searchQuery, category, budget, eventDate);
         });
 
-        document.querySelector('.filter-reset').addEventListener('click', function() {
-            document.getElementById('search-filter').value = '';
-            document.getElementById('category-filter').value = '';
-            document.getElementById('budget-filter').value = '';
-            document.getElementById('event-date').value = '';
-            
-            // Reset any filtered content
-            resetFilters();
-        });
+        // Fix: Only clear filter fields on reset, let the form submit to server for a true reset
+document.querySelector('.filter-reset').addEventListener('click', function(e) {
+    // No e.preventDefault() here, so the form submits and triggers server-side reset
+    document.getElementById('search-filter').value = '';
+    document.getElementById('category-filter').value = '';
+    document.getElementById('budget-filter').value = '';
+    document.getElementById('event-date').value = '';
+    // The form will submit with ?reset=1, and Flask will return all events
+});
 
         function filterEvents(searchQuery, category, budget, date) {
             const eventCards = document.querySelectorAll('.event-card');
