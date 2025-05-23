@@ -426,11 +426,14 @@
         <form class="filter-container" method="get" action="{{ url_for('welcome') }}">
             <div class="filter-header">
                 <h3 class="filter-title">Event filtering</h3>
-                <button type="submit" name="reset" value="1" class="filter-reset" style="background:none;border:none;cursor:pointer;">Reset Filters</button>
+                <!-- Reset Filters as a link -->
+                <a href="{{ url_for('welcome') }}" class="filter-reset" style="background:none;border:none;cursor:pointer;">Reset Filters</a>
             </div>
             <div class="filter-search-container">
                 <label class="filter-label" for="search-filter">Search events</label>
-                <input type="text" class="filter-search" id="search-filter" name="search" placeholder="Search by name, location, or keywords" value="{{ request.args.get('search', '') }}">
+                <input type="text" class="filter-search" id="search-filter" name="search"
+    placeholder="Search by name, location, or keywords"
+    value="{{ request.args.get('search', '') }}">
             </div>
             <div class="filter-options">
                 <div class="filter-group">
@@ -456,7 +459,8 @@
                 </div>
                 <div class="filter-group">
                     <label class="filter-label">Date</label>
-                    <input type="date" class="filter-input" id="event-date" name="date" value="{{ request.args.get('date', '') }}">
+                    <input type="date" class="filter-input" id="event-date" name="date"
+    value="{{ request.args.get('date', '') }}">
                 </div>
             </div>
             <button class="filter-apply" type="submit" id="apply-filters">Apply Filters</button>
@@ -468,10 +472,10 @@
                 {% for event in events %}
                 <div class="event-card">
                     {% if event.image_url %}
-  <div class="event-image" style="background-image: url('{{ event.image_url }}')"></div>
-{% else %}
-  <div class="event-image" style="background-image: url('https://source.unsplash.com/600x400/?event,{{ event.name|urlencode }}')"></div>
-{% endif %}
+            <div class="event-image" style="background-image: url('{{ event.image_url }}')"></div>
+            {% else %}
+            <div class="event-image" style="background-image: url('https://source.unsplash.com/600x400/?event,{{ event.name|urlencode }}')"></div>
+            {% endif %}
                     <div class="event-details">
                         <h4 class="event-title">{{ event.name }}</h4>
                         {% if event.category %}
@@ -487,6 +491,9 @@
                         <form method="POST" action="{{ url_for('book_event', event_id=event.id) }}">
                             <button type="submit" class="event-book">Book Now</button>
                         </form>
+                        <form method="get" action="{{ url_for('event_reviews', event_id=event.id) }}" style="margin-top:8px;">
+    <button type="submit" class="event-book" style="background:#ff6600;">See Reviews</button>
+</form>
                     </div>
                 </div>
                 {% else %}
@@ -584,7 +591,7 @@
             });
         });
 
-        // Filter functionality
+        // Filter functionality (optional, for client-side filtering)
         document.getElementById('apply-filters').addEventListener('click', function() {
             const searchQuery = document.getElementById('search-filter').value.toLowerCase();
             const category = document.getElementById('category-filter').value;
@@ -594,16 +601,6 @@
             // Filter the events based on these criteria
             filterEvents(searchQuery, category, budget, eventDate);
         });
-
-        // Fix: Only clear filter fields on reset, let the form submit to server for a true reset
-document.querySelector('.filter-reset').addEventListener('click', function(e) {
-    // No e.preventDefault() here, so the form submits and triggers server-side reset
-    document.getElementById('search-filter').value = '';
-    document.getElementById('category-filter').value = '';
-    document.getElementById('budget-filter').value = '';
-    document.getElementById('event-date').value = '';
-    // The form will submit with ?reset=1, and Flask will return all events
-});
 
         function filterEvents(searchQuery, category, budget, date) {
             const eventCards = document.querySelectorAll('.event-card');

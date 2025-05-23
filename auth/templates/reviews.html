@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Reviews for {{ event.name }}</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #f4f4f4; }
+        .container { max-width: 700px; margin: 40px auto; background: #fff; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.08); padding: 30px; }
+        h2 { color: #6e0399; }
+        .review-list { margin: 30px 0; }
+        .review { border-bottom: 1px solid #eee; padding: 15px 0; }
+        .review:last-child { border-bottom: none; }
+        .review-user { font-weight: bold; color: #6e0399; }
+        .review-rating { color: #ff6600; }
+        .review-content { margin: 8px 0; }
+        form textarea { width: 100%; min-height: 60px; margin-bottom: 10px; border-radius: 5px; border: 1px solid #ccc; padding: 8px; }
+        form select, form button { padding: 8px; border-radius: 5px; border: 1px solid #ccc; }
+        form button { background: #6e0399; color: #fff; border: none; font-weight: bold; cursor: pointer; }
+        form button:hover { background: #ae00ff; }
+        .back-link { display: inline-block; margin-top: 20px; color: #6e0399; text-decoration: none; }
+        .back-link:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Reviews for "{{ event.name }}"</h2>
+        <div class="review-list">
+            {% for review in reviews %}
+                <div class="review">
+                    <span class="review-user">{{ review.username }}</span>
+                    <span class="review-rating">{% for i in range(review.rating) %}★{% endfor %}</span>
+                    <div class="review-content">{{ review.content }}</div>
+                </div>
+            {% else %}
+                <p>No reviews yet. Be the first to review!</p>
+            {% endfor %}
+        </div>
+        {% if session.get('username') or session.get('username') == 'admin' %}
+        <form method="POST">
+            <label for="rating">Rating:</label>
+            <select name="rating" id="rating">
+                {% for i in range(1, 6) %}
+                <option value="{{ i }}">{{ i }} Star{% if i > 1 %}s{% endif %}</option>
+                {% endfor %}
+            </select>
+            <br>
+            <label for="content">Your Review:</label>
+            <textarea name="content" id="content" required></textarea>
+            <br>
+            <button type="submit">Submit Review</button>
+        </form>
+        {% else %}
+        <p><a href="{{ url_for('login') }}">Log in</a> to leave a review.</p>
+        {% endif %}
+        <a href="{{ url_for('welcome') }}" class="back-link">← Back to Events</a>
+    </div>
+</body>
+</html>

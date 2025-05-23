@@ -46,6 +46,15 @@ class Booking(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     event_id = db.Column(db.Integer, db.ForeignKey('event.id'), nullable=False)
 
+# Review model
+class Review(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    event_id = db.Column(db.Integer, db.ForeignKey('event.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    username = db.Column(db.String(80), nullable=False)
+    content = db.Column(db.Text, nullable=False)
+    rating = db.Column(db.Integer, nullable=False)
+
 with app.app_context():
     db.create_all()
 
@@ -242,6 +251,44 @@ def uploaded_file(filename):
 
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+@app.route('/event/<int:event_id>/reviews', methods=['GET', 'POST'])
+def event_reviews(event_id):
+    event = Event.query.get_or_404(event_id)
+    reviews = Review.query.filter_by(event_id=event_id).all()
+    if request.method == 'POST':
+        username = session.get('username')
+        if not username:
+            flash("Please log in to leave a review.")
+            return redirect(url_for('login'))
+        user = User.query.filter_by(username=username).first()
+        if not user and username == 'admin':
+            # Allow admin to leave a review even if not in User table
+            user_id = 0
+            display_name = 'admin'
+        elif user:
+            user_id = user.id
+            display_name = user.username
+        else:
+            flash("User not found. Please log in again.")
+            return redirect(url_for('login'))
+        content = request.form.get('content', '').strip()
+        rating = int(request.form.get('rating', 5))
+        if not content:
+            flash("Review cannot be empty.")
+        else:
+            review = Review(
+                event_id=event_id,
+                user_id=user_id,
+                username=display_name,
+                content=content,
+                rating=rating
+            )
+            db.session.add(review)
+            db.session.commit()
+            flash("Review submitted!")
+            return redirect(url_for('event_reviews', event_id=event_id))
+    return render_template('reviews.html', event=event, reviews=reviews)
 
 if __name__ == '__main__':
     app.run(debug=True)
