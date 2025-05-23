@@ -452,7 +452,7 @@
                     <label class="filter-label">Budget Range</label>
                     <select class="filter-select" id="budget-filter" name="budget">
                         <option value="">Any Budget</option>
-                        <option value="budget" {% if request.args.get('budget') == 'budget' %}selected{% endif %}>Budget ($100-$500)</option>
+                        <option value="budget" {% if request.args.get('budget') == 'budget' %}selected{% endif %}>Budget ($0-$500)</option>
                         <option value="midrange" {% if request.args.get('budget') == 'midrange' %}selected{% endif %}>Mid-Range ($500-$1500)</option>
                         <option value="luxury" {% if request.args.get('budget') == 'luxury' %}selected{% endif %}>Luxury ($1500+)</option>
                     </select>
