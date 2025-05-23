@@ -1,2 +1,3 @@
 # SWE1Project
-SWE1 project Event planner Web site
+CS 1250 Software Engineering 1 Course project
+Events Planner Tourism Management System Website
