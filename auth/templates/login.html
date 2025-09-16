@@ -88,6 +88,9 @@
 <body>
     <div class="login-container">
         <h1>Login</h1>
+        {% if error %}
+            <div class="error-message">{{ error }}</div>
+        {% endif %}
         <form method="POST" action="{{ url_for('login') }}">
             <label for="username">Username or Email:</label>
             <input type="text" id="username" name="username" required>

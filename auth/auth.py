@@ -2,7 +2,12 @@ from flask import Flask, redirect, render_template, url_for, request, session, f
 from flask_sqlalchemy import SQLAlchemy
 import os
 from werkzeug.utils import secure_filename
+from datetime import datetime, timedelta
 
+# Track failed login attempts and block time
+login_attempts = {}
+BLOCK_TIME = timedelta(minutes=5)
+MAX_ATTEMPTS = 5
 app = Flask(__name__)
 app.secret_key = 'your_secret_key'
 
@@ -57,25 +62,48 @@ class Review(db.Model):
 
 with app.app_context():
     db.create_all()
-
+#possibility of security risk (if a user repeats incorrect credentials it bans the user for a short amount out time)
 # Login route
+#Ip is requested to give an adress block on the specific id to protect security and suspicious behavior 
 @app.route('/', methods=["GET", "POST"])
 @app.route('/login', methods=["GET", "POST"])
 def login():
     error = None
+    ip = request.remote_addr # requests the IP adress of the user
+    now = datetime.now() #records date of current time to let the user know when they can retry the login
+    block_info = login_attempts.get(ip) #what this does is checks the log in attempts called at the start of the code, and sees if it matches the maximum number of attempts allowed, if it is more than the threshold then it request the ip and gives a temporary block
+
+    # Check if IP is blocked
+    if block_info and block_info.get('blocked_until'): #checks if amount of tries is 5 and blocks until time given
+        if now < block_info['blocked_until']:
+            error = f"Too many failed attempts. Try again after {block_info['blocked_until'].strftime('%H:%M:%S')}." #reads when the block happens and gives user a 5 minute ban depending on what time they attempted to login
+            return render_template("login.html", error=error) #shows on error message on the login.html page
+        else:
+            # Unblock after time passes
+            login_attempts[ip] = {'count': 0}
+
     if request.method == "POST":
         username = request.form.get("username")
         password = request.form.get("password")
         user = User.query.filter_by(username=username, password=password).first()
         if user or (username == USERNAME and password == PASSWORD):
             session['username'] = username
-            print("Login successful, redirecting to welcome")  # Debug
+            login_attempts[ip] = {'count': 0}  # Reset on success
             return redirect(url_for("welcome"))
         else:
-            error = "Invalid username or password"
+            # Increment failed attempts
+            if ip not in login_attempts:
+                login_attempts[ip] = {'count': 1}
+            else:
+                login_attempts[ip]['count'] += 1
+            if login_attempts[ip]['count'] >= MAX_ATTEMPTS:
+                login_attempts[ip]['blocked_until'] = now + BLOCK_TIME
+                error = f"Too many failed attempts. Try again after {(now + BLOCK_TIME).strftime('%H:%M:%S')}."
+            else:
+                error = f"Invalid username or password. Attempt {login_attempts[ip]['count']} of {MAX_ATTEMPTS}."
     return render_template("login.html", error=error)
 
-# Register route
+
 # Register route
 @app.route('/register', methods=["GET", "POST"])
 def register():
@@ -149,7 +177,7 @@ def show_events():
     user = User.query.filter_by(username=username).first()
     if not user:
         flash("User not found.")
-        return redirect(url_for('login'))
+        return redirect(url_for('login')) #should redirect to register
     bookings = Booking.query.filter_by(user_id=user.id).all()
     event_ids = [b.event_id for b in bookings]
     events = Event.query.filter(Event.id.in_(event_ids)).order_by(Event.date).all()
@@ -165,7 +193,7 @@ def book_event(event_id):
     user = User.query.filter_by(username=username).first()
     if not user:
         flash("User not found.")
-        return redirect(url_for('login'))
+        return redirect(url_for('login')) #should redirect to register
     if Booking.query.filter_by(user_id=user.id, event_id=event_id).first():
         flash("Already booked this event.")
         return redirect(url_for('welcome'))
@@ -289,6 +317,8 @@ def event_reviews(event_id):
             flash("Review submitted!")
             return redirect(url_for('event_reviews', event_id=event_id))
     return render_template('reviews.html', event=event, reviews=reviews)
+
+
 
 if __name__ == '__main__':
     app.run(debug=True)
