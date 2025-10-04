@@ -2,7 +2,7 @@
 
 Software Engineering 1 & 2 courses project.
 
-Events Planner Tourism Management System Website
+"Events Planner" Tourism Management System Website
 
 ### Team members
 
