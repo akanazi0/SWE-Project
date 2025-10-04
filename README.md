@@ -16,6 +16,6 @@ Software Engineering 1 & 2 courses project.
 
 ### What are we using ?
 
-- Front-End --> Html&Css
-- Back-End --> Flask(Python)
+- Front-End --> Html & Css
+- Back-End --> Flask (Python)
 - Database --> Sqlite
