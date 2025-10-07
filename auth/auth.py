@@ -30,35 +30,41 @@ if not os.path.exists(UPLOAD_FOLDER):
     os.makedirs(UPLOAD_FOLDER)
 
 # User model
-class User(db.Model):
+class User(db.Model): #create user database that stores usernames and passwords
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(80), unique=True, nullable=False)
     password = db.Column(db.String(120), nullable=False)
 
 # Event model
-class Event(db.Model):
+class Event(db.Model): #create event database that stores properties of each event
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(120), nullable=False)
     date = db.Column(db.String(20), nullable=False)
     description = db.Column(db.Text, nullable=False)
     price = db.Column(db.Float, nullable=True)
     image_url = db.Column(db.String(300), nullable=True)
-    category = db.Column(db.String(50), nullable=True)  # <-- Add this line
+    category = db.Column(db.String(50), nullable=True)  
 
 # Booking model
-class Booking(db.Model):
+class Booking(db.Model): #create database that stores each user id with each event the user booked
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     event_id = db.Column(db.Integer, db.ForeignKey('event.id'), nullable=False)
 
 # Review model
-class Review(db.Model):
+class Review(db.Model): #create database that stores user reviews for each event with the respective information for each user
     id = db.Column(db.Integer, primary_key=True)
     event_id = db.Column(db.Integer, db.ForeignKey('event.id'), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     username = db.Column(db.String(80), nullable=False)
     content = db.Column(db.Text, nullable=False)
     rating = db.Column(db.Integer, nullable=False)
+
+class IP(db.Model): #create databse that stores IP adresses for each user to ensure a block if a user has failed log in attempts
+    id = db.Column(db.Integer, primary_key=True)
+    ip = db.Column(db.String(45), unique=True, nullable=False)
+    count = db.Column(db.Integer, default=0)
+    blocked_until = db.Column(db.DateTime, nullable=True)
 
 with app.app_context():
     db.create_all()
@@ -69,18 +75,20 @@ with app.app_context():
 @app.route('/login', methods=["GET", "POST"])
 def login():
     error = None
-    ip = request.remote_addr # requests the IP adress of the user
-    now = datetime.now() #records date of current time to let the user know when they can retry the login
-    block_info = login_attempts.get(ip) #what this does is checks the log in attempts called at the start of the code, and sees if it matches the maximum number of attempts allowed, if it is more than the threshold then it request the ip and gives a temporary block
+    ip = request.remote_addr #requests ip from ip database
+    now = datetime.now() #records current date
+    ip_record = IP.query.filter_by(ip=ip).first() #queries the database for specific ip
 
     # Check if IP is blocked
-    if block_info and block_info.get('blocked_until'): #checks if amount of tries is 5 and blocks until time given
-        if now < block_info['blocked_until']:
-            error = f"Too many failed attempts. Try again after {block_info['blocked_until'].strftime('%H:%M:%S')}." #reads when the block happens and gives user a 5 minute ban depending on what time they attempted to login
-            return render_template("login.html", error=error) #shows on error message on the login.html page
+    if ip_record and ip_record.blocked_until:
+        if now < ip_record.blocked_until:
+            error = f"Too many failed attempts. Try again after {ip_record.blocked_until.strftime('%H:%M:%S')}."
+            return render_template("login.html", error=error)
         else:
             # Unblock after time passes
-            login_attempts[ip] = {'count': 0}
+            ip_record.count = 0
+            ip_record.blocked_until = None
+            db.session.commit()
 
     if request.method == "POST":
         username = request.form.get("username")
@@ -88,19 +96,26 @@ def login():
         user = User.query.filter_by(username=username, password=password).first()
         if user or (username == USERNAME and password == PASSWORD):
             session['username'] = username
-            login_attempts[ip] = {'count': 0}  # Reset on success
+            if not ip_record: #stores user IP at login
+                ip_record = IP(ip=ip, count=0)
+                db.session.add(ip_record)
+            else: #if log in is successful redirect to welcome
+                ip_record.count = 0
+                ip_record.blocked_until = None
+            db.session.commit()
             return redirect(url_for("welcome"))
-        else:
-            # Increment failed attempts
-            if ip not in login_attempts:
-                login_attempts[ip] = {'count': 1}
-            else:
-                login_attempts[ip]['count'] += 1
-            if login_attempts[ip]['count'] >= MAX_ATTEMPTS:
-                login_attempts[ip]['blocked_until'] = now + BLOCK_TIME
+        else: #if log in is unseccessful add count to number of allowed times for inccorect log in 
+            if not ip_record:
+                ip_record = IP(ip=ip, count=1)
+                db.session.add(ip_record)
+            else: #adds 1 to count for each fail
+                ip_record.count += 1
+            if ip_record.count >= MAX_ATTEMPTS: #if count reaches amount of max attempts then blocks the user for 5 minutes
+                ip_record.blocked_until = now + BLOCK_TIME
                 error = f"Too many failed attempts. Try again after {(now + BLOCK_TIME).strftime('%H:%M:%S')}."
-            else:
-                error = f"Invalid username or password. Attempt {login_attempts[ip]['count']} of {MAX_ATTEMPTS}."
+            else: # shows how many attempts user has before the block takes place
+                error = f"Invalid username or password. Attempt {ip_record.count} of {MAX_ATTEMPTS}."
+            db.session.commit()
     return render_template("login.html", error=error)
 
 
@@ -108,12 +123,12 @@ def login():
 @app.route('/register', methods=["GET", "POST"])
 def register():
     error = None
-    if request.method == "POST":
+    if request.method == "POST": #requests data from user database
         username = request.form.get("username")
         password = request.form.get("password")
-        if User.query.filter_by(username=username).first():
+        if User.query.filter_by(username=username).first(): #queries database to see if username already exists
             error = "Username already exists"
-        else:
+        else: #if username is not in the databse, adds the new user to the database
             newUser = User(username=username, password=password)
             db.session.add(newUser)
             db.session.commit()
@@ -156,12 +171,12 @@ def welcome():
 
     events = query.order_by(Event.date).all()
 
-    # Booked events logic (unchanged)
-    booked_events = []
-    username = session.get('username')
+    # Booked events logic 
+    booked_events = [] #stores booked events in an array for each user
+    username = session.get('username') #get username from databse for specific user
     if username:
         user = User.query.filter_by(username=username).first()
-        if user:
+        if user: #displays all booked events for specific user (from Booking and Event databses)
             bookings = Booking.query.filter_by(user_id=user.id).all()
             event_ids = [b.event_id for b in bookings]
             booked_events = Event.query.filter(Event.id.in_(event_ids)).order_by(Event.date).all()
@@ -170,62 +185,62 @@ def welcome():
 # Show only the logged-in user's booked events
 @app.route('/events')
 def show_events():
-    username = session.get('username')
+    username = session.get('username') #checks if user is logged in
     if not username:
         flash("Please log in to view your events.")
-        return redirect(url_for('login'))
+        return redirect(url_for('login'))#redirects user to login in order to log in to view events
     user = User.query.filter_by(username=username).first()
     if not user:
-        flash("User not found.")
-        return redirect(url_for('login')) #should redirect to register
-    bookings = Booking.query.filter_by(user_id=user.id).all()
-    event_ids = [b.event_id for b in bookings]
-    events = Event.query.filter(Event.id.in_(event_ids)).order_by(Event.date).all()
+        flash("User not found.") #if user does not exist
+        return redirect(url_for('register')) #redirects user to register page to create account
+    bookings = Booking.query.filter_by(user_id=user.id).all() #queries booking databse for respective user to show events the user booked
+    event_ids = [b.event_id for b in bookings] #finds event ids for each event
+    events = Event.query.filter(Event.id.in_(event_ids)).order_by(Event.date).all() #displays events to user on the events page
     return render_template('events.html', events=events)
 
 # Book an event
 @app.route('/book/<int:event_id>', methods=['POST'])
 def book_event(event_id):
-    username = session.get('username')
-    if not username:
+    username = session.get('username') #check if user is logged in 
+    if not username: #if user is not logged in 
         flash("Please log in to book events.")
-        return redirect(url_for('login'))
+        return redirect(url_for('login')) #redirects to login
     user = User.query.filter_by(username=username).first()
     if not user:
-        flash("User not found.")
-        return redirect(url_for('login')) #should redirect to register
-    if Booking.query.filter_by(user_id=user.id, event_id=event_id).first():
-        flash("Already booked this event.")
+        flash("User not found.") #if user does not exist
+        return redirect(url_for('register')) #redirects user to register
+    if Booking.query.filter_by(user_id=user.id, event_id=event_id).first(): #checks if user has booked the event previously 
+        flash("Already booked this event.") #flashes warning if the user already booked the event
         return redirect(url_for('welcome'))
-    booking = Booking(user_id=user.id, event_id=event_id)
-    db.session.add(booking)
-    db.session.commit()
-    flash("Event booked!")
-    return redirect(url_for('show_events'))
+    booking = Booking(user_id=user.id, event_id=event_id) #user books event
+    db.session.add(booking) #adds to the booking database specific to the user
+    db.session.commit() 
+    flash("Event booked!") 
+    return redirect(url_for('show_events')) #redirects to show_events where it displays the users booked events
 
 # Admin dashboard
 @app.route('/admin-dashboard')
 def admin_dashboard():
-    if session.get('username') != USERNAME:
+    if session.get('username') != USERNAME: #if current session belongs to normal user and not admin it refuses access (USERNAME = admin username)
         flash("Admin access only.")
         return redirect(url_for('login'))
-    return render_template("admin_dashboard.html")
+    return render_template("admin_dashboard.html") #redirects to admin dashboard when logged in as admin
 
 # Organizer portal (event management)
-@app.route('/admin/organizer-portal', methods=['GET', 'POST'])
+@app.route('/admin/organizer-portal', methods=['GET', 'POST']) #uses GET and POST requests to access data from server and send data to server
 def event_portal():
-    if session.get('username') != USERNAME:
+    if session.get('username') != USERNAME: #checks if user logged in is an admin or not
         flash("Admin access only.")
         return redirect(url_for('login'))
-    if request.method == 'POST':
-        name = request.form['name']
+    if request.method == 'POST': #requests POST methods to upload new data for new events (name, date, description, etc)
+        name = request.form['name'] 
         date = request.form['date']
         description = request.form['description']
         price = request.form.get('price', 0)
         category = request.form.get('category', '')
         image_url = ''
         image_file = request.files.get('image_file')
-        if image_file and allowed_file(image_file.filename):
+        if image_file and allowed_file(image_file.filename): #logic for allowing image uploading
             filename = secure_filename(image_file.filename)
             filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
             image_file.save(filepath)
@@ -236,59 +251,59 @@ def event_portal():
             description=description,
             price=price,
             image_url=image_url,
-            category=category  # <-- Save category
-        )
-        db.session.add(new_event)
+            category=category  
+        ) #create the event using data uploaded
+        db.session.add(new_event) #add new event to Event database
         db.session.commit()
         return redirect(url_for('event_portal'))
     events = Event.query.order_by(Event.date).all()
-    return render_template('org_portal.html', events=events)
+    return render_template('org_portal.html', events=events) #redirects to organizer portal page to add more events if needed
 
 # Admin: Show all events (admin view)
 @app.route('/admin/show-events')
 def admin_show_events():
-    if session.get('username') != USERNAME:
+    if session.get('username') != USERNAME: #checks if user logged in is an admin or not
         flash("Admin access only.")
         return redirect(url_for('login'))
-    events = Event.query.order_by(Event.date).all()
-    return render_template('admin_show_events.html', events=events)
+    events = Event.query.order_by(Event.date).all() 
+    return render_template('admin_show_events.html', events=events) #redirects to show all admin specific events page
 
 # Admin: Show all events (user view)
 @app.route('/admin/all-events')
 def admin_all_events():
-    if session.get('username') != USERNAME:
+    if session.get('username') != USERNAME: #checks if user logged in is an admin or not
         flash("Admin access only.")
         return redirect(url_for('login'))
     events = Event.query.order_by(Event.date).all()
-    return render_template('events.html', events=events)
+    return render_template('events.html', events=events) #redirects to show all events page(as if a user was viewing the events)
 
 # Delete event (from organizer portal)
 @app.route('/admin/events/delete/<int:event_id>', methods=['POST'])
 def delete_event(event_id):
-    if session.get('username') != USERNAME:
+    if session.get('username') != USERNAME: #checks if user logged in is an admin or not
         flash("Admin access only.")
         return redirect(url_for('login'))
     event = Event.query.get_or_404(event_id)
-    db.session.delete(event)
+    db.session.delete(event) #remove event from Events database
     db.session.commit()
     return redirect(url_for('event_portal'))
 
 @app.route('/uploads/<filename>')
 def uploaded_file(filename):
-    return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
+    return send_from_directory(app.config['UPLOAD_FOLDER'], filename) #access files from upload folder
 
 def allowed_file(filename):
-    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS #decide what type of file is allowed
 
 @app.route('/event/<int:event_id>/reviews', methods=['GET', 'POST'])
 def event_reviews(event_id):
     event = Event.query.get_or_404(event_id)
     reviews = Review.query.filter_by(event_id=event_id).all()
     if request.method == 'POST':
-        username = session.get('username')
+        username = session.get('username') #checks if user is logged in the session
         if not username:
             flash("Please log in to leave a review.")
-            return redirect(url_for('login'))
+            return redirect(url_for('login')) #redirects to login if user is not logged in 
         user = User.query.filter_by(username=username).first()
         if not user and username == 'admin':
             # Allow admin to leave a review even if not in User table
@@ -298,12 +313,12 @@ def event_reviews(event_id):
             user_id = user.id
             display_name = user.username
         else:
-            flash("User not found. Please log in again.")
-            return redirect(url_for('login'))
-        content = request.form.get('content', '').strip()
-        rating = int(request.form.get('rating', 5))
+            flash("User not found. Please log in again.") #user does not exist 
+            return redirect(url_for('login')) #should redirect to register
+        content = request.form.get('content', '').strip() #content of the review box
+        rating = int(request.form.get('rating', 5)) #rating out of 5 stars
         if not content:
-            flash("Review cannot be empty.")
+            flash("Review cannot be empty.") #if content box is empty then flash the error
         else:
             review = Review(
                 event_id=event_id,
@@ -311,8 +326,8 @@ def event_reviews(event_id):
                 username=display_name,
                 content=content,
                 rating=rating
-            )
-            db.session.add(review)
+            ) #create review with added data
+            db.session.add(review) #add review to the review database
             db.session.commit()
             flash("Review submitted!")
             return redirect(url_for('event_reviews', event_id=event_id))
