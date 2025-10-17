@@ -1,6 +1,7 @@
 from flask import Flask, redirect, render_template, url_for, request, session, flash, send_from_directory
 from flask_sqlalchemy import SQLAlchemy
 import os
+from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
 from datetime import datetime, timedelta
 
@@ -32,8 +33,9 @@ if not os.path.exists(UPLOAD_FOLDER):
 # User model
 class User(db.Model): #create user database that stores usernames and passwords
     id = db.Column(db.Integer, primary_key=True)
+    email = db.Column(db.String(80), unique = True, nullable = False)
     username = db.Column(db.String(80), unique=True, nullable=False)
-    password = db.Column(db.String(120), nullable=False)
+    password = db.Column(db.String(255), nullable=False)
 
 # Event model
 class Event(db.Model): #create event database that stores properties of each event
@@ -71,13 +73,15 @@ with app.app_context():
 #possibility of security risk (if a user repeats incorrect credentials it bans the user for a short amount out time)
 # Login route
 #Ip is requested to give an adress block on the specific id to protect security and suspicious behavior 
+from werkzeug.security import check_password_hash # Don't forget this import at the top of your file!
+
 @app.route('/', methods=["GET", "POST"])
 @app.route('/login', methods=["GET", "POST"])
 def login():
     error = None
-    ip = request.remote_addr #requests ip from ip database
-    now = datetime.now() #records current date
-    ip_record = IP.query.filter_by(ip=ip).first() #queries the database for specific ip
+    ip = request.remote_addr
+    now = datetime.now()
+    ip_record = IP.query.filter_by(ip=ip).first()
 
     # Check if IP is blocked
     if ip_record and ip_record.blocked_until:
@@ -93,8 +97,18 @@ def login():
     if request.method == "POST":
         username = request.form.get("username")
         password = request.form.get("password")
-        user = User.query.filter_by(username=username, password=password).first()
-        if user or (username == USERNAME and password == PASSWORD):
+        
+        # 1. Find user by username only
+        user = User.query.filter_by(username=username).first() 
+        is_authenticated = False
+        
+        if user:
+            # 2. Check the submitted plain password against the stored hash (handles all users, including admin)
+            is_authenticated = check_password_hash(user.password, password)
+        
+        # 3. Use the authentication flag for success check
+        if is_authenticated: # Login successful for either user or admin
+        
             session['username'] = username
             if not ip_record: #stores user IP at login
                 ip_record = IP(ip=ip, count=0)
@@ -124,12 +138,30 @@ def login():
 def register():
     error = None
     if request.method == "POST": #requests data from user database
+        email = request.form.get("email")
         username = request.form.get("username")
         password = request.form.get("password")
+        if len(password) < 5:
+            error = "password must be at least 5 characters"
+            return render_template("register.html", error = error)
+        
+        has_digit = False
+        for char in password:
+            if char.isdigit():
+                has_digit = True
+                break
+        if not has_digit:
+            error = "password must have at least one digit"
+            return render_template("register.html", error = error)
+        
+    
         if User.query.filter_by(username=username).first(): #queries database to see if username already exists
             error = "Username already exists"
-        else: #if username is not in the databse, adds the new user to the database
-            newUser = User(username=username, password=password)
+        elif User.query.filter_by(email = email).first():
+            error = "Email already exists"
+        else: #if username or email is not in the databse, adds the new user to the database
+            hashed_password = generate_password_hash(password)
+            newUser = User(email = email, username=username, password=hashed_password)
             db.session.add(newUser)
             db.session.commit()
             session['username'] = username  # Log the user in
@@ -336,6 +368,20 @@ def event_reviews(event_id):
 
 
 if __name__ == '__main__':
-    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
+    with app.app_context():
+        #create all databases
+        db.create_all()
+        #check if admin credentials exist
+        admin = User.query.filter_by(username = USERNAME).first()
+        #if admin does not exist
+        if not admin:
+            #create secure hashed admin password
+            admin_hashed_password = generate_password_hash(PASSWORD)
+            #create user model for admin
+            admin = User (username = USERNAME,password = admin_hashed_password, email = "ntsa3d@gmail.com")
+            db.session.add(admin)
+            db.session.commit()
+
+    
     app.run(debug=True)
 
