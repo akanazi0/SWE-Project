@@ -73,7 +73,7 @@ with app.app_context():
 #possibility of security risk (if a user repeats incorrect credentials it bans the user for a short amount out time)
 # Login route
 #Ip is requested to give an adress block on the specific id to protect security and suspicious behavior 
-from werkzeug.security import check_password_hash # Don't forget this import at the top of your file!
+
 
 @app.route('/', methods=["GET", "POST"])
 @app.route('/login', methods=["GET", "POST"])
@@ -98,15 +98,15 @@ def login():
         username = request.form.get("username")
         password = request.form.get("password")
         
-        # 1. Find user by username only
+        #  Find user by username only
         user = User.query.filter_by(username=username).first() 
         is_authenticated = False
         
         if user:
-            # 2. Check the submitted plain password against the stored hash (handles all users, including admin)
+            # Check the submitted plain password with the stored hash 
             is_authenticated = check_password_hash(user.password, password)
         
-        # 3. Use the authentication flag for success check
+        #  Use the authentication flag for success check
         if is_authenticated: # Login successful for either user or admin
         
             session['username'] = username
@@ -382,6 +382,6 @@ if __name__ == '__main__':
             db.session.add(admin)
             db.session.commit()
 
-    
-    app.run(debug=True)
+    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
+    app.run(debug=False)
 
