@@ -10,16 +10,14 @@ login_attempts = {}
 BLOCK_TIME = timedelta(minutes=5)
 MAX_ATTEMPTS = 5
 app = Flask(__name__)
-app.secret_key = 'your_secret_key'
+
 
 # Database config
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
-# Admin credentials
-USERNAME = "admin"
-PASSWORD = "ntsa3d"
+
 
 # File upload config
 UPLOAD_FOLDER = os.path.join(os.path.dirname(__file__), 'uploads')
