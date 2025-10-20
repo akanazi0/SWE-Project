@@ -10,7 +10,7 @@ login_attempts = {}
 BLOCK_TIME = timedelta(minutes=5)
 MAX_ATTEMPTS = 5
 app = Flask(__name__)
-app.secret_key = 'your_secret_key'
+
 
 # Database config
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.db'
