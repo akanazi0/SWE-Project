@@ -369,22 +369,21 @@ def event_reviews(event_id):
 
 if __name__ == '__main__':
     with app.app_context():
-        #create all databases
+        # create all databases
         db.create_all()
-        #check if admin credentials exist
-        admin = User.query.filter_by(username = USERNAME).first()
+        # check if admin credentials exist
+        admin = User.query.filter_by(username=USERNAME).first()
         # if admin does not exist
         if not admin:
             # create secure hashed admin password
             admin_hashed_password = generate_password_hash(PASSWORD)
             # create user model for admin
             admin = User(
-            username=USERNAME,
-            password=admin_hashed_password,
-            email="ntsa3d@gmail.com"
-)
+                username=USERNAME,
+                password=admin_hashed_password,
+                email="ntsa3d@gmail.com",
+            )
             db.session.add(admin)
             db.session.commit()
 
-    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
-    app.run(debug=False)
+    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)), debug=False)
