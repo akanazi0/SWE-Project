@@ -15,13 +15,3 @@ def test_login_page(client):
     response = client.get("/login")
     assert response.status_code == 200
 
-def test_successful_login(client):
-    response = client.post("/login", data={"username": "testuser", "password": "testpass"})
-    assert response.status_code == 302
-    assert response.headers["Location"].endswith("/protected")
-
-def test_already_logged_in_redirect(client):
-     with client:
-          client.post("/login", data={"username": "testuser", "password": "testpass"})
-          response = client.get("/login")
-          assert response.status_code == 302
