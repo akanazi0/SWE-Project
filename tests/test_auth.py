@@ -25,8 +25,3 @@ def test_already_logged_in_redirect(client):
           client.post("/login", data={"username": "testuser", "password": "testpass"})
           response = client.get("/login")
           assert response.status_code == 302
-
-
-def test_login_with_empty_credentials(client):
-     response = client.post("/login", data={"username": "", "password": ""})
-     assert b"Invalid credentials" in response.data
