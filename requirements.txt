@@ -2,3 +2,6 @@ Flask
 Flask_SQLAlchemy
 Werkzeug
 gunicorn
+pytest
+pytest-html
+flake8
