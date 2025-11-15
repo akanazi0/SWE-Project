@@ -378,9 +378,10 @@ if __name__ == '__main__':
             #create secure hashed admin password
             admin_hashed_password = generate_password_hash(PASSWORD)
             #create user model for admin
-            admin = User (username=USERNAME, password=admin_hashed_password, email = "ntsa3d@gmail.com")
+            admin = User(username=USERNAME, password=admin_hashed_password, email="ntsa3d@gmail.com")
             db.session.add(admin)
             db.session.commit()
 
     app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
     app.run(debug=False)
+    
