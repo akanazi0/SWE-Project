@@ -27,7 +27,7 @@ jobs:
         run: pytest --html=report.html --self-contained-html
 
       - name: Non-functional Tests (Static Analysis)
-        run: flake8 . --output-file flake8_report.txt
+        run: flake8 . --output-file flake8_report.txt || { cat flake8_report.txt; exit 1; }
 
       - name: Upload Reports
         uses: actions/upload-artifact@v4
