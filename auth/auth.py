@@ -198,7 +198,6 @@ def register():
 def welcome():
     # Get filter parameters
     search = request.args.get("search", "").strip()
-    category = request.args.get("category", "").strip()
     budget = request.args.get("budget", "").strip()
     date = request.args.get("date", "").strip()
     reset = request.args.get("reset")
