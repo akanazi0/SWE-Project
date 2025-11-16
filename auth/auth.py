@@ -230,7 +230,7 @@ def welcome():
                 (Event.name.ilike(f"%{search}%"))
                 | (Event.description.ilike(f"%{search}%"))
             )
-        
+
         if category:
             query = query.filter(Event.category == category)
         if budget:
