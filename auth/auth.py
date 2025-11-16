@@ -134,7 +134,7 @@ def login():
                 is_authenticated = check_password_hash(user.password, password)
 
         # authentication flag for success check
-        if is_authenticated:  
+        if is_authenticated:
             session["username"] = username
             if not ip_record:  # stores user IP at login
                 ip_record = IP(ip=ip, count=0)
@@ -202,9 +202,7 @@ def register():
             # if username or email is not in the databse
             # adds the new user to the database
             hashed_password = generate_password_hash(password)
-            newUser = User(email=email, 
-                           username=username, 
-                           password=hashed_password)
+            newUser = User(email=email, username=username, password=hashed_password)
             db.session.add(newUser)
             db.session.commit()
             session["username"] = username  # Log the user in
@@ -260,8 +258,7 @@ def welcome():
             booked_events = (
                 Event.query.filter(Event.id.in_(event_ids)).order_by(Event.date).all()
             )
-    return render_template("welcome.html", 
-                           events=events, booked_events=booked_events)
+    return render_template("welcome.html", events=events, booked_events=booked_events)
 
 
 # Show only the logged-in user's booked events
@@ -322,7 +319,7 @@ def book_event(event_id):
 # Admin dashboard
 @app.route("/admin-dashboard")
 def admin_dashboard():
-    if session.get("username") != USERNAME:  
+    if session.get("username") != USERNAME:
         # if current session belongs to normal user
         # and not admin it refuses access (USERNAME = admin username)
         flash("Admin access only.")
@@ -427,8 +424,7 @@ def uploaded_file(filename):
 
 def allowed_file(filename):
     return (
-        "." in filename 
-        and filename.rsplit(".", 1)[1].lower() in ALLOWED_EXTENSIONS
+        "." in filename and filename.rsplit(".", 1)[1].lower() in ALLOWED_EXTENSIONS
     )  # decide what type of file is allowed
 
 
