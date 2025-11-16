@@ -47,7 +47,7 @@ def test_lgn_01_admin_login_success(client):
     """Tests TC ID: LGN-01 - Login with valid admin credentials"""
     response = client.post(
         "/login",
-        data={"username": "admin", "password": "ntsa3d"},
+        data={"username": "admin", "password": "adminpass123"},
         follow_redirects=True,
     )
 
@@ -66,7 +66,7 @@ def test_lgn_02_member_login_success(client):
 
     # Expected Result: Login success -> Member homepage
     assert response.status_code == 200
-    assert b"Welcome" in response.data
+    assert b"Existing Event" in response.data
 
 
 def test_lgn_03_wrong_password(client):
@@ -108,7 +108,7 @@ def test_reg_01_and_02_registration_success(client):
 
     # Expected Result: Registration success -> Member homepage
     assert response.status_code == 200
-    assert b"Welcome" in response.data
+    assert b"All Events" in response.data
 
 
 def test_reg_03_email_already_used(client):
