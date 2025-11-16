@@ -141,19 +141,21 @@ def test_srch_01_search_existing(client):
     assert response.status_code == 200
     assert b"Existing Event" in response.data  # The event name should be in the HTML
 
+
 #
 # def test_srch_02_search_non_existing(client):
 #   """Tests TC ID: SRCH-02 - Search for non-existing event"""
 #   client.post("/login", data={"username": "member", "password": "memberpass1"})
 #   response = client.get("/welcome?search=Non-Existing+Event")
 #
-    # Expected Result: Event is unavailable (not shown)
+# Expected Result: Event is unavailable (not shown)
 #    assert response.status_code == 200
 #    assert (
 #         b"Existing Event" not in response.data
 #     )  # Make sure the other event isn't there
 #     assert b"Non-Existing Event" not in response.data
 #
+
 
 def test_bev_07_book_not_logged_in(client):
     """Tests TC ID: BEV-07 - Book event without login"""
