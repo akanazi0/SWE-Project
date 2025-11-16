@@ -8,7 +8,8 @@ from flask import (
     flash,
     send_from_directory,
 )
-from flask_sqlalchemy import SQLAlchemy 
+from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import or_
 import os
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
@@ -226,8 +227,12 @@ def welcome():
     # Apply filters if not reset
     if not reset:
         if search:
-            query = query.filter((Event.name.ilike(f"%{search}%") | Event.description.ilike(f"%{search}%")))
-
+            query = query.filter(
+                or_(
+                    Event.name.ilike(f"%{search}%"),
+                    Event.description.ilike(f"%{search}%")
+                )
+            )
         if category:
             query = query.filter(Event.category == category)
         if budget:
