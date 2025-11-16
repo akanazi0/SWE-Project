@@ -506,7 +506,7 @@
             <div class="container">
                <div class="about-section">
                     <h3>About Events Planner Tourism Management System</h3>
-                    <p>At Events Planner Tourism Management System, we believe that travel should be seamless, personalized, and unforgettable. Founded in 2025, our mission is to connect travelers with unique experiences, hidden gems, and expert-planned itineraries—all in one place. Whether you're a solo adventurer, a couple seeking romance, or a family planning the perfect getaway, we're here to turn your travel dreams into reality.</p>
+                    <p>At Events Planner Tourism Management System, we believe that travel should be seamless, personalized, and unforgettable. Founded in 2025, our mission is to connect travelers with unique experiences, hidden gems, and expert-planned itineraries—all in one place. Whether you're a solo adventurer, or a family planning the perfect getaway, we're here to turn your travel dreams into reality.</p>
                 </div>
             </div>
         </section>
@@ -563,7 +563,7 @@
         document.getElementById('events-nav').addEventListener('click', function(e) {
             e.preventDefault();
             showSection('main-content');
-            // Scroll to events section
+            
             document.querySelector('.events-container').scrollIntoView({ behavior: 'smooth' });
         });
 
@@ -583,22 +583,22 @@
                 const eventCard = this.closest('.event-card');
                 const eventTitle = eventCard.querySelector('.event-title').textContent;
                 
-                // In a real app, this would add the event to the user's bookings
+                
                 alert(`You've booked: ${eventTitle}\nThis event has been added to your bookings.`);
                 
-                // Show the booked events section
+                
                 showSection('booked-events-section');
             });
         });
 
-        // Filter functionality (optional, for client-side filtering)
+        
         document.getElementById('apply-filters').addEventListener('click', function() {
             const searchQuery = document.getElementById('search-filter').value.toLowerCase();
             const category = document.getElementById('category-filter').value;
             const budget = document.getElementById('budget-filter').value;
             const eventDate = document.getElementById('event-date').value;
             
-            // Filter the events based on these criteria
+          
             filterEvents(searchQuery, category, budget, eventDate);
         });
 
@@ -613,13 +613,13 @@
                 const priceText = card.querySelector('.event-price').textContent;
                 const price = parseFloat(priceText.replace(/[^0-9.]/g, ''));
                 
-                // Determine budget range
+                
                 let cardBudget = '';
                 if (price < 500) cardBudget = 'budget';
                 else if (price < 1500) cardBudget = 'midrange';
                 else cardBudget = 'luxury';
                 
-                // Check if card matches all filters
+               
                 const matchesSearch = searchQuery === '' || 
                     title.includes(searchQuery) || 
                     desc.includes(searchQuery);
@@ -630,8 +630,7 @@
                 const matchesBudget = budget === '' || 
                     cardBudget === budget;
                 
-                // Date filtering would require actual event dates in your data
-                // For this example, we'll just show the card if no date is selected
+                
                 const matchesDate = date === ''; 
                 
                 if (matchesSearch && matchesCategory && matchesBudget && matchesDate) {
@@ -654,7 +653,7 @@
             });
         }
 
-        // Initialize by showing the main content
+        
         showSection('main-content');
     </script>
 </body>
