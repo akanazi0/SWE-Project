@@ -99,8 +99,6 @@ with app.app_context():
 
 # Login route
 # Ip is requested to give an adress block on the specific id
-
-
 @app.route("/", methods=["GET", "POST"])
 @app.route("/login", methods=["GET", "POST"])
 def login():
@@ -124,17 +122,23 @@ def login():
         username = request.form.get("username")
         password = request.form.get("password")
 
-        #  Find user by username only
-        user = User.query.filter_by(username=username).first()
         is_authenticated = False
+        
+        # --- THIS IS THE NEW LOGIC ---
+        # 1. First, check if it's the special hardcoded admin
+        if username == USERNAME and password == PASSWORD:
+            is_authenticated = True
+        
+        # 2. If not the admin, check the database for a regular user
+        else:
+            user = User.query.filter_by(username=username).first()
+            if user:
+                # Check the submitted plain password with the stored hash
+                is_authenticated = check_password_hash(user.password, password)
+        # --- END OF NEW LOGIC ---
 
-        if user:
-            # Check the submitted plain password with the stored hash
-            is_authenticated = check_password_hash(user.password, password)
-
-        #  Use the authentication flag for success check
+        # 3. Use the authentication flag for success check
         if is_authenticated:  # Login successful for either user or admin
-
             session["username"] = username
             if not ip_record:  # stores user IP at login
                 ip_record = IP(ip=ip, count=0)
@@ -143,7 +147,15 @@ def login():
                 ip_record.count = 0
                 ip_record.blocked_until = None
             db.session.commit()
-            return redirect(url_for("welcome"))
+            
+            # --- ALSO ADD THIS CHECK ---
+            # Redirect admin to the admin dashboard, others to welcome
+            if username == USERNAME:
+                return redirect(url_for("admin_dashboard"))
+            else:
+                return redirect(url_for("welcome"))
+            # ---------------------------
+
         else:
             # if log in is unseccessful add count to number
             # of allowed times for inccorect log in
@@ -161,6 +173,7 @@ def login():
                 # shows how many attempts user has before the block takes place
                 error = f"Invalid username or password. Attempt {ip_record.count} of {MAX_ATTEMPTS}."
             db.session.commit()
+            
     return render_template("login.html", error=error)
 
 
