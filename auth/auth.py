@@ -42,7 +42,7 @@ if not os.path.exists(UPLOAD_FOLDER):
 
 # User model
 # create user database that stores usernames and passwords
-class User(db.Model):  
+class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(80), unique=True, nullable=False)
     username = db.Column(db.String(80), unique=True, nullable=False)
@@ -51,7 +51,7 @@ class User(db.Model):
 
 # Event model
 # create event database that stores properties of each event
-class Event(db.Model):  
+class Event(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(120), nullable=False)
     date = db.Column(db.String(20), nullable=False)
@@ -71,11 +71,9 @@ class Booking(
 
 
 # Review model
-# create database that stores user reviews 
+# create database that stores user reviews
 # for each event with the respective information for each user
-class Review(
-    db.Model
-):  
+class Review(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     event_id = db.Column(db.Integer, db.ForeignKey("event.id"), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
@@ -83,11 +81,10 @@ class Review(
     content = db.Column(db.Text, nullable=False)
     rating = db.Column(db.Integer, nullable=False)
 
-# create databse that stores IP adresses for each user 
+
+# create databse that stores IP adresses for each user
 # to ensure a block if a user has failed log in attempts
-class IP(
-    db.Model
-):  
+class IP(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     ip = db.Column(db.String(45), unique=True, nullable=False)
     count = db.Column(db.Integer, default=0)
@@ -96,12 +93,13 @@ class IP(
 
 with app.app_context():
     db.create_all()
-# possibility of security risk 
+# possibility of security risk
 # (if a user repeats incorrect credentials it bans the user for a short amount out time)
 
 
 # Login route
-# Ip is requested to give an adress block on the specific id 
+# Ip is requested to give an adress block on the specific id
+
 
 @app.route("/", methods=["GET", "POST"])
 @app.route("/login", methods=["GET", "POST"])
@@ -146,7 +144,7 @@ def login():
                 ip_record.blocked_until = None
             db.session.commit()
             return redirect(url_for("welcome"))
-        else:  
+        else:
             # if log in is unseccessful add count to number
             # of allowed times for inccorect log in
             if not ip_record:
@@ -154,12 +152,12 @@ def login():
                 db.session.add(ip_record)
             else:  # adds 1 to count for each fail
                 ip_record.count += 1
-            if (ip_record.count >= MAX_ATTEMPTS):  
+            if ip_record.count >= MAX_ATTEMPTS:
                 # if count reaches amount of max attempts
                 # then blocks the user for 5 minutes
                 ip_record.blocked_until = now + BLOCK_TIME
                 error = f"Too many failed attempts. Try again after {(now + BLOCK_TIME).strftime('%H:%M:%S')}."
-            else:  
+            else:
                 # shows how many attempts user has before the block takes place
                 error = f"Invalid username or password. Attempt {ip_record.count} of {MAX_ATTEMPTS}."
             db.session.commit()
@@ -193,7 +191,7 @@ def register():
             error = "Username already exists"
         elif User.query.filter_by(email=email).first():
             error = "Email already exists"
-        else:  
+        else:
             # if username or email is not in the databse
             # adds the new user to the database
             hashed_password = generate_password_hash(password)
@@ -240,13 +238,13 @@ def welcome():
     events = query.order_by(Event.date).all()
 
     # Booked events logic
-    booked_events = []  
+    booked_events = []
     # stores booked events in an array for each user
-    username = session.get("username")  
+    username = session.get("username")
     # get username from databse for specific user
     if username:
         user = User.query.filter_by(username=username).first()
-        if (user):  
+        if user:
             # displays all booked events for specific user
             bookings = Booking.query.filter_by(user_id=user.id).all()
             event_ids = [b.event_id for b in bookings]
@@ -271,10 +269,10 @@ def show_events():
         return redirect(
             url_for("register")
         )  # redirects user to register page to create account
-    bookings = Booking.query.filter_by(user_id=user.id).all()  
+    bookings = Booking.query.filter_by(user_id=user.id).all()
     # queries booking databse for respective user to show events the user booked
     # finds event ids for each event
-    event_ids = [b.event_id for b in bookings]  
+    event_ids = [b.event_id for b in bookings]
 
     events = (
         Event.query.filter(Event.id.in_(event_ids)).order_by(Event.date).all()
@@ -302,8 +300,8 @@ def book_event(event_id):
         return redirect(url_for("welcome"))
     booking = Booking(user_id=user.id, event_id=event_id)  # user books event
     # adds to the booking database specific to the user
-    db.session.add(booking)  
-   
+    db.session.add(booking)
+
     db.session.commit()
     flash("Event booked!")
     return redirect(
@@ -314,9 +312,7 @@ def book_event(event_id):
 # Admin dashboard
 @app.route("/admin-dashboard")
 def admin_dashboard():
-    if (
-        session.get("username") != USERNAME
-    ):  # if current session belongs to normal user 
+    if session.get("username") != USERNAME:  # if current session belongs to normal user
         # and not admin it refuses access (USERNAME = admin username)
         flash("Admin access only.")
         return redirect(url_for("login"))
@@ -329,16 +325,14 @@ def admin_dashboard():
 @app.route(
     "/admin/organizer-portal", methods=["GET", "POST"]
 )  # uses GET and POST requests to access data
-   # from server and send data to server
+# from server and send data to server
 def event_portal():
     if (
         session.get("username") != USERNAME
     ):  # checks if user logged in is an admin or not
         flash("Admin access only.")
         return redirect(url_for("login"))
-    if (
-        request.method == "POST"
-    ):  # requests POST methods to upload new data 
+    if request.method == "POST":  # requests POST methods to upload new data
         # for new events (name, date, description, etc)
         name = request.form["name"]
         date = request.form["date"]
@@ -431,7 +425,7 @@ def event_reviews(event_id):
     event = Event.query.get_or_404(event_id)
     reviews = Review.query.filter_by(event_id=event_id).all()
     if request.method == "POST":
-        username = session.get("username")  
+        username = session.get("username")
         if not username:
             flash("Please log in to leave a review.")
             return redirect(
@@ -446,10 +440,10 @@ def event_reviews(event_id):
             user_id = user.id
             display_name = user.username
         else:
-            flash("User not found. Please log in again.") 
+            flash("User not found. Please log in again.")
             return redirect(url_for("login"))  # should redirect to register
         # content of the review box
-        content = request.form.get("content", "").strip()  
+        content = request.form.get("content", "").strip()
         rating = int(request.form.get("rating", 5))  # rating out of 5 stars
         if not content:
             flash(
