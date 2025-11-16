@@ -108,7 +108,7 @@ def test_reg_01_and_02_registration_success(client):
 
     # Expected Result: Registration success -> Member homepage
     assert response.status_code == 200
-    assert b"All Events" in response.data
+    assert b"Booked Events" in response.data
 
 
 def test_reg_03_email_already_used(client):
@@ -162,4 +162,4 @@ def test_bev_07_book_not_logged_in(client):
     # Expected Result: Redirect to login
     assert response.status_code == 200
     assert b"Please log in to book events" in response.data
-    assert b"Log In" in response.data
+    assert b"Login" in response.data

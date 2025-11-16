@@ -97,6 +97,9 @@
             </div>
         {% endif %}
     {% endwith %}
+    {% if error %}
+        <p style="color:red; text-align:center;">{{ error }}</p>
+    {% endif %}
         <form method="POST" action="{{ url_for('login') }}">
             <label for="username">Username or Email:</label>
             <input type="text" id="username" name="username" required>
