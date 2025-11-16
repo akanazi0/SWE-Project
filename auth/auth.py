@@ -41,7 +41,8 @@ if not os.path.exists(UPLOAD_FOLDER):
 
 
 # User model
-class User(db.Model):  # create user database that stores usernames and passwords
+# create user database that stores usernames and passwords
+class User(db.Model):  
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(80), unique=True, nullable=False)
     username = db.Column(db.String(80), unique=True, nullable=False)
@@ -49,7 +50,8 @@ class User(db.Model):  # create user database that stores usernames and password
 
 
 # Event model
-class Event(db.Model):  # create event database that stores properties of each event
+# create event database that stores properties of each event
+class Event(db.Model):  
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(120), nullable=False)
     date = db.Column(db.String(20), nullable=False)
@@ -69,9 +71,11 @@ class Booking(
 
 
 # Review model
+# create database that stores user reviews 
+# for each event with the respective information for each user
 class Review(
     db.Model
-):  # create database that stores user reviews for each event with the respective information for each user
+):  
     id = db.Column(db.Integer, primary_key=True)
     event_id = db.Column(db.Integer, db.ForeignKey("event.id"), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
@@ -79,10 +83,11 @@ class Review(
     content = db.Column(db.Text, nullable=False)
     rating = db.Column(db.Integer, nullable=False)
 
-
+# create databse that stores IP adresses for each user 
+# to ensure a block if a user has failed log in attempts
 class IP(
     db.Model
-):  # create databse that stores IP adresses for each user to ensure a block if a user has failed log in attempts
+):  
     id = db.Column(db.Integer, primary_key=True)
     ip = db.Column(db.String(45), unique=True, nullable=False)
     count = db.Column(db.Integer, default=0)
@@ -91,10 +96,12 @@ class IP(
 
 with app.app_context():
     db.create_all()
-# possibility of security risk (if a user repeats incorrect credentials it bans the user for a short amount out time)
-# Login route
-# Ip is requested to give an adress block on the specific id to protect security and suspicious behavior
+# possibility of security risk 
+# (if a user repeats incorrect credentials it bans the user for a short amount out time)
 
+
+# Login route
+# Ip is requested to give an adress block on the specific id 
 
 @app.route("/", methods=["GET", "POST"])
 @app.route("/login", methods=["GET", "POST"])
@@ -139,18 +146,21 @@ def login():
                 ip_record.blocked_until = None
             db.session.commit()
             return redirect(url_for("welcome"))
-        else:  # if log in is unseccessful add count to number of allowed times for inccorect log in
+        else:  
+            # if log in is unseccessful add count to number
+            # of allowed times for inccorect log in
             if not ip_record:
                 ip_record = IP(ip=ip, count=1)
                 db.session.add(ip_record)
             else:  # adds 1 to count for each fail
                 ip_record.count += 1
-            if (
-                ip_record.count >= MAX_ATTEMPTS
-            ):  # if count reaches amount of max attempts then blocks the user for 5 minutes
+            if (ip_record.count >= MAX_ATTEMPTS):  
+                # if count reaches amount of max attempts
+                # then blocks the user for 5 minutes
                 ip_record.blocked_until = now + BLOCK_TIME
                 error = f"Too many failed attempts. Try again after {(now + BLOCK_TIME).strftime('%H:%M:%S')}."
-            else:  # shows how many attempts user has before the block takes place
+            else:  
+                # shows how many attempts user has before the block takes place
                 error = f"Invalid username or password. Attempt {ip_record.count} of {MAX_ATTEMPTS}."
             db.session.commit()
     return render_template("login.html", error=error)
@@ -183,7 +193,9 @@ def register():
             error = "Username already exists"
         elif User.query.filter_by(email=email).first():
             error = "Email already exists"
-        else:  # if username or email is not in the databse, adds the new user to the database
+        else:  
+            # if username or email is not in the databse
+            # adds the new user to the database
             hashed_password = generate_password_hash(password)
             newUser = User(email=email, username=username, password=hashed_password)
             db.session.add(newUser)
@@ -228,13 +240,14 @@ def welcome():
     events = query.order_by(Event.date).all()
 
     # Booked events logic
-    booked_events = []  # stores booked events in an array for each user
-    username = session.get("username")  # get username from databse for specific user
+    booked_events = []  
+    # stores booked events in an array for each user
+    username = session.get("username")  
+    # get username from databse for specific user
     if username:
         user = User.query.filter_by(username=username).first()
-        if (
-            user
-        ):  # displays all booked events for specific user (from Booking and Event databses)
+        if (user):  
+            # displays all booked events for specific user
             bookings = Booking.query.filter_by(user_id=user.id).all()
             event_ids = [b.event_id for b in bookings]
             booked_events = (
@@ -258,10 +271,11 @@ def show_events():
         return redirect(
             url_for("register")
         )  # redirects user to register page to create account
-    bookings = Booking.query.filter_by(
-        user_id=user.id
-    ).all()  # queries booking databse for respective user to show events the user booked
-    event_ids = [b.event_id for b in bookings]  # finds event ids for each event
+    bookings = Booking.query.filter_by(user_id=user.id).all()  
+    # queries booking databse for respective user to show events the user booked
+    # finds event ids for each event
+    event_ids = [b.event_id for b in bookings]  
+
     events = (
         Event.query.filter(Event.id.in_(event_ids)).order_by(Event.date).all()
     )  # displays events to user on the events page
@@ -287,7 +301,9 @@ def book_event(event_id):
         )  # flashes warning if the user already booked the event
         return redirect(url_for("welcome"))
     booking = Booking(user_id=user.id, event_id=event_id)  # user books event
-    db.session.add(booking)  # adds to the booking database specific to the user
+    # adds to the booking database specific to the user
+    db.session.add(booking)  
+   
     db.session.commit()
     flash("Event booked!")
     return redirect(
@@ -300,7 +316,8 @@ def book_event(event_id):
 def admin_dashboard():
     if (
         session.get("username") != USERNAME
-    ):  # if current session belongs to normal user and not admin it refuses access (USERNAME = admin username)
+    ):  # if current session belongs to normal user 
+        # and not admin it refuses access (USERNAME = admin username)
         flash("Admin access only.")
         return redirect(url_for("login"))
     return render_template(
@@ -311,7 +328,8 @@ def admin_dashboard():
 # Organizer portal (event management)
 @app.route(
     "/admin/organizer-portal", methods=["GET", "POST"]
-)  # uses GET and POST requests to access data from server and send data to server
+)  # uses GET and POST requests to access data
+   # from server and send data to server
 def event_portal():
     if (
         session.get("username") != USERNAME
@@ -320,7 +338,8 @@ def event_portal():
         return redirect(url_for("login"))
     if (
         request.method == "POST"
-    ):  # requests POST methods to upload new data for new events (name, date, description, etc)
+    ):  # requests POST methods to upload new data 
+        # for new events (name, date, description, etc)
         name = request.form["name"]
         date = request.form["date"]
         description = request.form["description"]
@@ -412,7 +431,7 @@ def event_reviews(event_id):
     event = Event.query.get_or_404(event_id)
     reviews = Review.query.filter_by(event_id=event_id).all()
     if request.method == "POST":
-        username = session.get("username")  # checks if user is logged in the session
+        username = session.get("username")  
         if not username:
             flash("Please log in to leave a review.")
             return redirect(
@@ -427,9 +446,10 @@ def event_reviews(event_id):
             user_id = user.id
             display_name = user.username
         else:
-            flash("User not found. Please log in again.")  # user does not exist
+            flash("User not found. Please log in again.") 
             return redirect(url_for("login"))  # should redirect to register
-        content = request.form.get("content", "").strip()  # content of the review box
+        # content of the review box
+        content = request.form.get("content", "").strip()  
         rating = int(request.form.get("rating", 5))  # rating out of 5 stars
         if not content:
             flash(
@@ -469,4 +489,5 @@ if __name__ == "__main__":
             db.session.add(admin)
             db.session.commit()
 
-    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)), debug=False)
+    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
+    app.run(debug=False)
