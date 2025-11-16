@@ -28,7 +28,7 @@ db = SQLAlchemy(app)
 
 # Admin credentials
 USERNAME = "admin"
-PASSWORD = "ntsa3d"
+PASSWORD = "adminpass123"
 
 # File upload config
 UPLOAD_FOLDER = os.path.join(os.path.dirname(__file__), "uploads")
@@ -94,7 +94,6 @@ class IP(db.Model):
 with app.app_context():
     db.create_all()
 # possibility of security risk
-# (if a user repeats incorrect credentials it bans the user for a short amount out time)
 
 
 # Login route
@@ -123,22 +122,19 @@ def login():
         password = request.form.get("password")
 
         is_authenticated = False
-        
-        # --- THIS IS THE NEW LOGIC ---
-        # 1. First, check if it's the special hardcoded admin
+
+        # check if it's the special admin
         if username == USERNAME and password == PASSWORD:
             is_authenticated = True
-        
-        # 2. If not the admin, check the database for a regular user
+
+        # If not the admin, check the database for a regular user
         else:
             user = User.query.filter_by(username=username).first()
             if user:
-                # Check the submitted plain password with the stored hash
                 is_authenticated = check_password_hash(user.password, password)
-        # --- END OF NEW LOGIC ---
 
-        # 3. Use the authentication flag for success check
-        if is_authenticated:  # Login successful for either user or admin
+        # authentication flag for success check
+        if is_authenticated:  
             session["username"] = username
             if not ip_record:  # stores user IP at login
                 ip_record = IP(ip=ip, count=0)
@@ -147,14 +143,12 @@ def login():
                 ip_record.count = 0
                 ip_record.blocked_until = None
             db.session.commit()
-            
-            # --- ALSO ADD THIS CHECK ---
+
             # Redirect admin to the admin dashboard, others to welcome
             if username == USERNAME:
                 return redirect(url_for("admin_dashboard"))
             else:
                 return redirect(url_for("welcome"))
-            # ---------------------------
 
         else:
             # if log in is unseccessful add count to number
@@ -173,7 +167,7 @@ def login():
                 # shows how many attempts user has before the block takes place
                 error = f"Invalid username or password. Attempt {ip_record.count} of {MAX_ATTEMPTS}."
             db.session.commit()
-            
+
     return render_template("login.html", error=error)
 
 
@@ -208,7 +202,9 @@ def register():
             # if username or email is not in the databse
             # adds the new user to the database
             hashed_password = generate_password_hash(password)
-            newUser = User(email=email, username=username, password=hashed_password)
+            newUser = User(email=email, 
+                           username=username, 
+                           password=hashed_password)
             db.session.add(newUser)
             db.session.commit()
             session["username"] = username  # Log the user in
@@ -264,7 +260,8 @@ def welcome():
             booked_events = (
                 Event.query.filter(Event.id.in_(event_ids)).order_by(Event.date).all()
             )
-    return render_template("welcome.html", events=events, booked_events=booked_events)
+    return render_template("welcome.html", 
+                           events=events, booked_events=booked_events)
 
 
 # Show only the logged-in user's booked events
@@ -283,7 +280,7 @@ def show_events():
             url_for("register")
         )  # redirects user to register page to create account
     bookings = Booking.query.filter_by(user_id=user.id).all()
-    # queries booking databse for respective user to show events the user booked
+    # queries booking databse for user to show events the user booked
     # finds event ids for each event
     event_ids = [b.event_id for b in bookings]
 
@@ -325,7 +322,8 @@ def book_event(event_id):
 # Admin dashboard
 @app.route("/admin-dashboard")
 def admin_dashboard():
-    if session.get("username") != USERNAME:  # if current session belongs to normal user
+    if session.get("username") != USERNAME:  
+        # if current session belongs to normal user
         # and not admin it refuses access (USERNAME = admin username)
         flash("Admin access only.")
         return redirect(url_for("login"))
@@ -429,7 +427,8 @@ def uploaded_file(filename):
 
 def allowed_file(filename):
     return (
-        "." in filename and filename.rsplit(".", 1)[1].lower() in ALLOWED_EXTENSIONS
+        "." in filename 
+        and filename.rsplit(".", 1)[1].lower() in ALLOWED_EXTENSIONS
     )  # decide what type of file is allowed
 
 
