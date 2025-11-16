@@ -218,6 +218,7 @@ def welcome():
     budget = request.args.get("budget", "").strip()
     date = request.args.get("date", "").strip()
     reset = request.args.get("reset")
+    category = request.args.get("category", "").strip()
 
     # Start with all events
     query = Event.query
@@ -229,9 +230,9 @@ def welcome():
                 (Event.name.ilike(f"%{search}%"))
                 | (Event.description.ilike(f"%{search}%"))
             )
-        # Example: If you add a category field to Event, filter here
-        # if category:
-        #     query = query.filter(Event.category == category)
+        
+        if category:
+            query = query.filter(Event.category == category)
         if budget:
             if budget == "budget":
                 query = query.filter(Event.price < 500)
