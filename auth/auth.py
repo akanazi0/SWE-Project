@@ -230,7 +230,7 @@ def welcome():
             query = query.filter(
                 or_(
                     Event.name.ilike(f"%{search}%"),
-                    Event.description.ilike(f"%{search}%")
+                    Event.description.ilike(f"%{search}%"),
                 )
             )
         if category:
