@@ -452,9 +452,9 @@
                     <label class="filter-label">Budget Range</label>
                     <select class="filter-select" id="budget-filter" name="budget">
                         <option value="">Any Budget</option>
-                        <option value="budget" {% if request.args.get('budget') == 'budget' %}selected{% endif %}>Budget ($0-$500)</option>
-                        <option value="midrange" {% if request.args.get('budget') == 'midrange' %}selected{% endif %}>Mid-Range ($500-$1500)</option>
-                        <option value="luxury" {% if request.args.get('budget') == 'luxury' %}selected{% endif %}>Luxury ($1500+)</option>
+                        <option value="budget" {% if request.args.get('budget') == 'budget' %}selected{% endif %}>Budget (⃁0-⃁500)</option>
+                        <option value="midrange" {% if request.args.get('budget') == 'midrange' %}selected{% endif %}>Mid-Range (⃁500-⃁1500)</option>
+                        <option value="luxury" {% if request.args.get('budget') == 'luxury' %}selected{% endif %}>Luxury (⃁1500+)</option>
                     </select>
                 </div>
                 <div class="filter-group">
@@ -486,7 +486,7 @@
                         <p class="event-description">{{ event.description }}</p>
                         <div class="event-meta">
                             <span>{{ event.date }}</span>
-                            <span class="event-price">${{ "%.2f"|format(event.price or 0) }}</span>
+                            <span class="event-price">⃁{{ "%.2f"|format(event.price or 0) }}</span>
                         </div>
                         <form method="POST" action="{{ url_for('book_event', event_id=event.id) }}">
                             <button type="submit" class="event-book">Book Now</button>
