@@ -112,47 +112,11 @@ SWE-Project/
 
 ## 👥 Contributors
 
-<!-- ALL-CONTRIBUTORS-LIST:START -->
-<table>
-  <tbody>
-    <tr>
-      <td align="center" valign="top" width="14.28%">
-        <a href="https://github.com/AkhmDev">
-          <img src="https://github.com/AkhmDev.png?size=100" width="100px;" alt="AkhmDev"/><br />
-          <sub><b>Abdulelah Khalaf Alanazi</b></sub>
-        </a>
-      </td>
-      <td align="center" valign="top" width="14.28%">
-        <a href="https://github.com/shbl1">
-          <img src="https://github.com/shbl1.png?size=100" width="100px;" alt="shbl1"/><br />
-          <sub><b>Mohammed Salah Alshebil</b></sub>
-        </a>
-      </td>
-      <td align="center" valign="top" width="14.28%">
-        <a href="https://github.com/abosaudalmansour">
-          <img src="https://github.com/abosaudalmansour.png?size=100" width="100px;" alt="abosaudalmansour"/><br />
-          <sub><b>Abdulaziz Abdulrahman Aldaws</b></sub>
-        </a>
-      </td>
-      <td align="center" valign="top" width="14.28%">
-        <a href="https://github.com/Almqbel">
-          <img src="https://github.com/Almqbel.png?size=100" width="100px;" alt="Almqbel"/><br />
-          <sub><b>Abdulkreem Abdullah Almqbel</b></sub>
-        </a>
-      </td>
-      <td align="center" valign="top" width="14.28%">
-        <a href="https://github.com/KJ66KK">
-          <img src="https://github.com/KJ66KK.png?size=100" width="100px;" alt="KJ66KK"/><br />
-          <sub><b>Khalid Hesham Aljubaily</b></sub>
-        </a>
-      </td>
-      <td align="center" valign="top" width="14.28%">
-        <a href="https://github.com/AbdullahAM1">
-          <img src="https://github.com/AbdullahAM1.png?size=100" width="100px;" alt="AbdullahAM1"/><br />
-          <sub><b>Abdullah Ali Almanee</b></sub>
-        </a>
-      </td>
-    </tr>
-  </tbody>
-</table>
-<!-- ALL-CONTRIBUTORS-LIST:END -->
+| Name | GitHub |
+|---|---|
+| Abdulelah Khalaf Alanazi | <a href="https://github.com/AkhmDev"><img src="https://github.com/AkhmDev.png?size=30" width="30px;" alt=""/> @AkhmDev</a> |
+| Mohammed Salah Alshebil | <a href="https://github.com/shbl1"><img src="https://github.com/shbl1.png?size=30" width="30px;" alt=""/> @shbl1</a> |
+| Abdulaziz Abdulrahman Aldaws | <a href="https://github.com/abosaudalmansour"><img src="https://github.com/abosaudalmansour.png?size=30" width="30px;" alt=""/> @abosaudalmansour</a> |
+| Abdulkreem Abdullah Almqbel | <a href="https://github.com/Almqbel"><img src="https://github.com/Almqbel.png?size=30" width="30px;" alt=""/> @Almqbel</a> |
+| Khalid Hesham Aljubaily | <a href="https://github.com/KJ66KK"><img src="https://github.com/KJ66KK.png?size=30" width="30px;" alt=""/> @KJ66KK</a> |
+| Abdullah Ali Almanee | <a href="https://github.com/AbdullahAM1"><img src="https://github.com/AbdullahAM1.png?size=30" width="30px;" alt=""/> @AbdullahAM1</a> |
