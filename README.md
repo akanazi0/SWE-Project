@@ -108,15 +108,3 @@ SWE-Project/
 └── README.md
 ```
 
----
-
-## 👥 Contributors
-
-| Name | GitHub |
-|---|---|
-| Abdulelah Khalaf Alanazi | <a href="https://github.com/AkhmDev"><img src="https://github.com/AkhmDev.png?size=30" width="30px;" alt=""/> @AkhmDev</a> |
-| Mohammed Salah Alshebil | <a href="https://github.com/shbl1"><img src="https://github.com/shbl1.png?size=30" width="30px;" alt=""/> @shbl1</a> |
-| Abdulaziz Abdulrahman Aldaws | <a href="https://github.com/abosaudalmansour"><img src="https://github.com/abosaudalmansour.png?size=30" width="30px;" alt=""/> @abosaudalmansour</a> |
-| Abdulkreem Abdullah Almqbel | <a href="https://github.com/Almqbel"><img src="https://github.com/Almqbel.png?size=30" width="30px;" alt=""/> @Almqbel</a> |
-| Khalid Hesham Aljubaily | <a href="https://github.com/KJ66KK"><img src="https://github.com/KJ66KK.png?size=30" width="30px;" alt=""/> @KJ66KK</a> |
-| Abdullah Ali Almanee | <a href="https://github.com/AbdullahAM1"><img src="https://github.com/AbdullahAM1.png?size=30" width="30px;" alt=""/> @AbdullahAM1</a> |
