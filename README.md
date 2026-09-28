@@ -114,7 +114,7 @@ SWE-Project/
 
 | Name | GitHub |
 |---|---|
-| Abdulelah Khalaf Alanazi | <a href="https://github.com/AkhmDev"><img src="https://github.com/AkhmDev.png?size=30" width="30px;" alt=""/> @AkhmDev</a> |
+| Abdulelah Khalaf Alanazi | <a href="https://github.com/akanazi0"><img src="https://github.com/akanazi0.png?size=30" width="30px;" alt=""/> @akanazi0</a> |
 | Mohammed Salah Alshebil | <a href="https://github.com/shbl1"><img src="https://github.com/shbl1.png?size=30" width="30px;" alt=""/> @shbl1</a> |
 | Abdulaziz Abdulrahman Aldaws | <a href="https://github.com/abosaudalmansour"><img src="https://github.com/abosaudalmansour.png?size=30" width="30px;" alt=""/> @abosaudalmansour</a> |
 | Abdulkreem Abdullah Almqbel | <a href="https://github.com/Almqbel"><img src="https://github.com/Almqbel.png?size=30" width="30px;" alt=""/> @Almqbel</a> |
